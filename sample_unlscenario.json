@@ -1,0 +1,80 @@
+{
+    "name": "Ripple Testnet sample scenario",
+    "description": "A sample UNL connectivity change scenario for the Ripple Testnet",
+    "authors":[ {
+                "fullname": "Antonios Inglezakis",
+                "email": "inglezakis.a@unic.ac.cy",
+                "affiliation": "Institute For the Future - University of Nicosia"}
+            ],
+    "states":{
+        "initial_state":{
+            "validators":{
+                "validator-0":{
+                    "unl":["validator-0","validator-2"],
+                    "connected":["validator-0","validator-1","validator-2","validator-3"]
+                },
+                "validator-1":{
+                    "unl":["validator-1","validator-2","validator-3"],
+                    "connected":["validator-0","validator-1","validator-2","validator-3"]
+                },
+                "validator-2":{
+                    "unl":["validator-0","validator-2","validator-3"],
+                    "connected":["validator-0","validator-1","validator-2","validator-3"]
+                },
+                "validator-3":{
+                    "unl":["validator-0","validator-2","validator-1"],
+                    "connected":["validator-0","validator-1","validator-2","validator-3"]
+                }
+            }
+
+        },
+        "10000":{
+            "validators":{
+                "validator-0":{
+                    "unl":["validator-0","validator-2","validator-3"],
+                    "connected":["validator-0","validator-1","validator-2","validator-3"]
+                },
+                "validator-1":{
+                    "unl":["validator-0","validator-2","validator-3"],
+                    "connected":["validator-0","validator-1","validator-2","validator-3"]
+                },
+                "validator-2":{
+                    "unl":["validator-1","validator-2","validator-3"],
+                    "connected":["validator-0","validator-1","validator-2","validator-3"]
+                },
+                "validator-3":{
+                    "unl":["validator-2","validator-1"],
+                    "connected":["validator-0","validator-1","validator-2","validator-3"]
+                }
+            }
+        },
+        "15000":{
+            "validators":{
+                "validator-0":{
+                    "unl":["validator-0","validator-1","validator-3"],
+                    "connected":["validator-0","validator-1","validator-2","validator-3"]
+                },
+                "validator-3":{
+                    "unl":["validator-0","validator-2","validator-3"],
+                    "connected":["validator-0","validator-1","validator-2","validator-3"]
+                }
+            }
+        },
+        "150000":{
+            "validators":{
+                "validator-1":{
+                    "unl":["validator-0","validator-2","validator-3"],
+                    "connected":["validator-0","validator-1","validator-2","validator-3"]
+                },
+                "validator-2":{
+                    "unl":["validator-1","validator-2","validator-3"],
+                    "connected":["validator-0","validator-1","validator-2","validator-3"]
+                },
+                "validator-3":{
+                    "unl":["validator-2","validator-1"],
+                    "connected":["validator-0","validator-1","validator-2","validator-3"]
+                }
+            }
+        }
+    }
+}

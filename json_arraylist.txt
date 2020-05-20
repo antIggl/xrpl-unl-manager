@@ -1,0 +1,5 @@
+[
+  "validator-0",
+  "validator-1",
+  "validator-genesis"
+]

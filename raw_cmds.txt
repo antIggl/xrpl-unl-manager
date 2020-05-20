@@ -1,0 +1,2 @@
+ cat ../ripple-testnet/configfiles/validators-map.json | jq -r 'keys[]' > line_list.txt
+ cat ../ripple-testnet/configfiles/validators-map.json | jq 'keys' > json_array.txt
