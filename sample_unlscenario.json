@@ -7,7 +7,9 @@
                 "affiliation": "Institute For the Future - University of Nicosia"}
             ],
     "states":{
-        "initial_state":{
+        "0":{
+            "state_id":"initial_state",
+            "comments":"The state_id can then be used for reference in any scripts reading the scenario. It is also used as id by the visualizer.",
             "validators":{
                 "validator-0":{
                     "unl":["validator-0","validator-2"],
@@ -29,6 +31,8 @@
 
         },
         "10000":{
+            "state_id":"state_1",
+            "comments":"The state_id can then be used for reference in any scripts reading the scenario. It is also used as id by the visualizer.",
             "validators":{
                 "validator-0":{
                     "unl":["validator-0","validator-2","validator-3"],
@@ -49,6 +53,8 @@
             }
         },
         "15000":{
+            "state_id":"state_2",
+            "comments":"The state_id can then be used for reference in any scripts reading the scenario. It is also used as id by the visualizer.",
             "validators":{
                 "validator-0":{
                     "unl":["validator-0","validator-1","validator-3"],
@@ -61,6 +67,8 @@
             }
         },
         "150000":{
+            "state_id":"state_3",
+            "comments":"The state_id can then be used for reference in any scripts reading the scenario. It is also used as id by the visualizer.",
             "validators":{
                 "validator-1":{
                     "unl":["validator-0","validator-2","validator-3"],
