@@ -3,6 +3,8 @@
 import argparse
 import sys
 import utils
+import scenario_utils as scutils
+
 
 argparser=argparse.ArgumentParser(description="Manages the UNL files for a Ripple Testnet.")
 cmdgroup=argparser.add_mutually_exclusive_group(required=False)
@@ -24,5 +26,12 @@ argparser.add_argument("-t","--generate-unl-on-time",type=int, help="Generates t
 aa=argparser.parse_args()
 print (aa)
 
+# mfcont=scutils.readScenarioFile(aa.scenario_file)
 #if __name__=='__main__':
+msc=scutils.UNLScenario(scenario_fname=aa.scenario_file)
+print (msc)
 
+mscV=scutils.ScenarioVisualizer(msc)
+
+mdotg=mscV.getUNLGraphAtTime(0)
+mdotg.render('./testout.gv',view=True)
