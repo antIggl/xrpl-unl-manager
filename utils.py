@@ -127,7 +127,7 @@ def decodeManifest(manifest_blob):
             manifest_dec['signature'] = binascii.hexlify(data)
         elif mtypefield == 0x7012:
             manifest_dec['master_signature'] = binascii.hexlify(data)
-         elif mtypefield == 0x77:
+        elif mtypefield == 0x77:
             manifest_dec['domain'] = data
         else:
             print("Unexpected parsed field: ",
