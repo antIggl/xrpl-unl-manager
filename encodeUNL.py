@@ -1,22 +1,8 @@
 #!/usr/bin/env python3
-import argparse
 import sys
 import utils
 import json
 import os
-
-argparser=argparse.ArgumentParser(description="Encodes a Ripple UNL from a file containing either a JSON list or line-separated validator names")
-argparser.add_argument("-f","--list-file", default='./unl-list.json', type=str, help="Defines the UNL file to be parsed")
-# cmdgroup.set_defaults()
-
-argparser.add_argument("-v","--version", default=1,type=int,
-                            help="Defines the version of the UNL.")
-argparser.add_argument("-kf","--keys-file", default='./unl-generator-token.txt', type=str, help="Defines the keys-pair file used to sign the UNL")
-argparser.add_argument("-kp","--validators-keys-path", default='./configfiles/', type=str, help="Defines the root path for the validators")
-argparser.add_argument("-o","--output-file", type=str,default='./encoded-list.json',help="Defines the output file.")
-
-aa=argparser.parse_args()
-# print (aa,aa.keys_file)
 
 def parseValidatorTokenFile(vtokenfname):
     """Parses the validator-token.txt file and return a json object
@@ -44,6 +30,9 @@ def parseListFile(listfname:str):
 
     Arguments:
         listfname {str} -- [description]
+    
+    Returns:
+        list of validator names
     """
     with open(listfname,'r') as f:
         fcont=f.read()
@@ -60,25 +49,41 @@ def parseListFile(listfname:str):
                 # it's commented out
                 flines.remove(l)
         return flines
-    
-vtoken=parseValidatorTokenFile(aa.keys_file)
-# print(vtoken)
 
-mvallist=parseListFile(aa.list_file)
-# print(mvallist)
+if __name__=='__main__':
+    import argparse
 
-vkpath=os.path.abspath(aa.validators_keys_path)
-# print(vkpath)
+    argparser=argparse.ArgumentParser(description="Encodes a Ripple UNL from a file containing either a JSON list or line-separated validator names")
+    argparser.add_argument("-f","--list-file", default='./unl-list.json', type=str, help="Defines the UNL file to be parsed")
+    # cmdgroup.set_defaults()
 
-# print(aa.version)
+    argparser.add_argument("-v","--version", default=1,type=int,
+                                help="Defines the version of the UNL.")
+    argparser.add_argument("-kf","--keys-file", default='./unl-generator-token.txt', type=str, help="Defines the keys-pair file used to sign the UNL")
+    argparser.add_argument("-kp","--validators-keys-path", default='./configfiles/', type=str, help="Defines the root path for the validators")
+    argparser.add_argument("-o","--output-file", type=str,default='./encoded-list.json',help="Defines the output file.")
 
-# print(aa.output_file)
+    aa=argparser.parse_args()
 
-munl=utils.createUNL(mvallist,vtoken,aa.version,vkpath)
-# print(munl)
-# print (json.dumps(munl))
+    # print (aa,aa.keys_file)  
+    vtoken=parseValidatorTokenFile(aa.keys_file)
+    # print(vtoken)
 
-with open(aa.output_file,'w') as f:
-    json.dump(munl,f)
+    mvallist=parseListFile(aa.list_file)
+    # print(mvallist)
 
-print ('Finished!!!')
+    vkpath=os.path.abspath(aa.validators_keys_path)
+    # print(vkpath)
+
+    # print(aa.version)
+
+    # print(aa.output_file)
+
+    munl=utils.createUNL(mvallist,vtoken,aa.version,vkpath)
+    # print(munl)
+    # print (json.dumps(munl))
+
+    with open(aa.output_file,'w') as f:
+        json.dump(munl,f)
+
+    print ('Finished!!!')
