@@ -25,13 +25,13 @@ pip install -r ./requirements.txt
 ```
 ## Running scripts in a Docker container
 
-The following command launches a Docker container with an interractive shell, after it installing the python modules using ***requirements.txt** file. 
+The following command launches a Docker container with an interractive shell, after it installing the python modules using ```requirements.txt``` file. 
 ```bash
 SRC_PATH=$(realpath relative/path/to/srcdir) ./docker/launch_container.sh
 ```
 In case Docker daemon won't find the ```python:3``` image locally, it will pull it from Dockerhub.
  
-The initialization script that runs before the interractive shell can be found in ```./docker/init_contianer.sh```.
+The initialization script that runs before the interractive shell can be found in ```./docker/init_container.sh```.
 
 ## Scripts command line arguments and configuration
 

@@ -15,9 +15,3 @@ else
             python:3 /bin/bash
 fi
 
-#docker run -it --rm --name ${CONTAINER_NAME} \
-#            -v ${SRC_PATH}:/app \
-#            --workdir /app \
-#            python:3 /bin/bash
-
-
