@@ -1,0 +1,11 @@
+base58==2.0.1
+certifi==2020.6.20
+cffi==1.14.0
+chardet==3.0.4
+cryptography==2.9.2
+idna==2.10
+pkg-resources==0.0.0
+pycparser==2.20
+requests==2.24.0
+six==1.15.0
+urllib3==1.25.9

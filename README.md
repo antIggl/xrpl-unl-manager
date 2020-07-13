@@ -1,10 +1,10 @@
-# Ripple UNL Manager
-Set of scripts to encode/decode and manage Unique Node Lists for Ripple testnet validators.
+# XRPL UNL Manager
+Set of scripts to encode/decode and manage Unique Node Lists for XRPL testnet validators.
 
 ***IT'S STILL UNDER HEAVY DEVELOPMENT***
 
 ## How it works
-These scripts are used to execute a scenario of UNL changes in a Ripple Testnet.
+These scripts are used to execute a scenario of UNL changes in a XRPL Testnet.
 * *unl_manager.py* : can run as a system daemon or standalone. It runs in a loop an executes the UNL changes for each validator as it is defined in the scenario file.
       When another *unl_manager.py* process is running in the same *publish_path*, it can  print the status or stop the running process.
       It also maintains a directory tree in the publish_path that can be served by any Web server.
@@ -31,7 +31,7 @@ usage: unl_manager.py [-h] [--start | --stop | --status] [-sc SCENARIO_FILE]
                       [-p PUBLISH_PATH] [-k KEYS_PATH] [-c] [-i]
                       [-t GENERATE_UNL_ON_TIME]
 
-Manages the UNL files for a Ripple Testnet.
+Manages the UNL files for a XRPL Testnet.
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -51,7 +51,7 @@ optional arguments:
                         network initialization (testnet time=0)
   -t GENERATE_UNL_ON_TIME, --generate-unl-on-time GENERATE_UNL_ON_TIME
                         Generates the UNL files for all the validators for the
-                        given time. Time should be defined in Ripple Epoch
+                        given time. Time should be defined in XRPL Epoch
                         (secs since 01-01-2000)
 ```
 
@@ -60,7 +60,7 @@ optional arguments:
 usage: decodeUNL.py [-h] (-f FILE | -u URL) [-v] [-pb | -pl | -pv]
                     [-o OUTPUT_FILE]
 
-Decodes a Ripple UNL either from a file or from a URL
+Decodes a XRPL UNL either from a file or from a URL
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -80,7 +80,7 @@ optional arguments:
 usage: encodeUNL.py [-h] [-f LIST_FILE] [-v VERSION] [-kf KEYS_FILE]
                     [-kp VALIDATORS_KEYS_PATH] [-o OUTPUT_FILE]
 
-Encodes a Ripple UNL from a file containing either a JSON list or line-
+Encodes a XRPL UNL from a file containing either a JSON list or line-
 separated validator names
 
 optional arguments:
@@ -130,4 +130,3 @@ TODO:
 
 ## Contributors
 * Antonios Inglezakis (@antiggl)
-
