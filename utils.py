@@ -174,6 +174,31 @@ def createValidatorsList(validators_names_list: list, keys_path: str):
     return vallist
 
 
+def convertToRippleTime(tstamp=time.time()):
+    """Converts given timestamp, seconds since Epoch(1/1/1970), to Ripple Timestamp, seconds since Ripple Epoch (1/1/2000)
+
+    Args:
+        tstamp (timestamp, optional): The timestamp (seconds from Epoch). Defaults to time.time().
+
+    Returns:
+        timestamp: Ripple Timestamp, seconds since Ripple Epoch (1/1/2000)
+    """
+    ripple_epoch = time.mktime(time.strptime("20000101000000", "%Y%m%d%H%M%S"))
+    return tstamp - ripple_epoch
+
+def convertToUnixTime(rtstamp):
+    """Converts given timestamp, seconds since Epoch(1/1/1970), to Ripple Timestamp, seconds since Ripple Epoch (1/1/2000)
+
+    Args:
+        tstamp (timestamp, optional): The timestamp (seconds from Epoch). Defaults to time.time().
+
+    Returns:
+        timestamp: Ripple Timestamp, seconds since Ripple Epoch (1/1/2000)
+    """
+    ripple_epoch = time.mktime(time.strptime("20000101000000", "%Y%m%d%H%M%S"))
+    return rtstamp + ripple_epoch
+
+
 def createUNL(validators_names_list: list, validator_gen_keys: dict, version: int, keys_path: str):
     """Creates a properly signed UNL that contains only the validators in the validators_names_list
 
@@ -189,9 +214,10 @@ def createUNL(validators_names_list: list, validator_gen_keys: dict, version: in
     mblob_data['validators'] = createValidatorsList(
         validators_names_list, keys_path)
     mblob_data['sequence'] = version
+    # We set the expiration date to be 1 year after.
     td = time.mktime(time.strptime("19710101000000", "%Y%m%d%H%M%S"))
-    ripple_epoch = time.mktime(time.strptime("20000101000000", "%Y%m%d%H%M%S"))
-    mblob_data['expiration'] = time.time() + td - ripple_epoch
+    mblob_data['expiration'] = convertToRippleTime(time.time()) + td
+    
     # print(mblob_data, type(mblob_data))
     mblob_bin = base64.b64encode(json.dumps(mblob_data).encode('ascii'))
     munl['blob'] = mblob_bin.decode('ascii')
