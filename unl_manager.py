@@ -246,6 +246,6 @@ if __name__=='__main__':
     elif ('generate_unl_on_time' in config[config_section].keys()) and (config[config_section].getint('generate_unl_on_time')>=0) :
         print ("Generating UNL files for all the validators on specific time", config[config_section]['generate_unl_on_time'] )
         generateUNLsAtTime(msc,vtoken,config[config_section]['publish_path'],config[config_section]['keys_path'],config[config_section].getint('generate_unl_on_time'))
-        # print (generateValidatorUNLAtTime(msc,vtoken,config[config_section]['keys_path'],"validator-0",config[config_section]['generate_unl_on_time']))
+        
 
-    # print("Publish path: ", config[config_section]['publish_path'])
+    

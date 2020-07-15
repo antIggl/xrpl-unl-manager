@@ -37,23 +37,42 @@ The initialization script that runs before the interractive shell can be found i
 
 ### UNL manager script
 ```
-usage: unl_manager.py [-h] [--start | --stop | --status] [-sc SCENARIO_FILE]
-                      [-p PUBLISH_PATH] [-k KEYS_PATH] [-c] [-i]
-                      [-t GENERATE_UNL_ON_TIME]
+usage: unl_manager.py [-h]
+                      [--start | --stop | --status | --reload | --restart]
+                      [-d] [-sf STATUS_FILE] [-pid PID_FILE]
+                      [-workdir WORKING_DIRECTORY] [-log LOG_FILE]
+                      [-conf CONFIG_FILE] [-sc SCENARIO_FILE]
+                      [-p PUBLISH_PATH] [-k KEYS_PATH] [-kf KEYS_FILE] [-c]
+                      [-i | -t GENERATE_UNL_ON_TIME]
 
-Manages the UNL files for a XRPL Testnet.
+Manages the UNL files for a Ripple Testnet.
 
 optional arguments:
   -h, --help            show this help message and exit
   --start               Starts running the scenario file.
   --stop                Stops the running process on the same publish path
   --status              Prints the current state of the running process.
+  --reload              Reloads configuration from files
+  --restart             Restarts Daemon process.
+  -d, --daemon          Runs as a daemon.
+  -sf STATUS_FILE, --status-file STATUS_FILE
+                        Defines the status file.
+  -pid PID_FILE, --pid-file PID_FILE
+                        Defines the pid locking file.
+  -workdir WORKING_DIRECTORY, --working-directory WORKING_DIRECTORY
+                        Defines the working directory.
+  -log LOG_FILE, --log-file LOG_FILE
+                        Defines the working directory.
+  -conf CONFIG_FILE, --config-file CONFIG_FILE
+                        Defines the configuration file.
   -sc SCENARIO_FILE, --scenario-file SCENARIO_FILE
                         Defines the scenario file to execute.
   -p PUBLISH_PATH, --publish-path PUBLISH_PATH
                         Defines the root of publish.
   -k KEYS_PATH, --keys-path KEYS_PATH
                         Defines the root path for the validators key pairs
+  -kf KEYS_FILE, --keys-file KEYS_FILE
+                        Defines the keys-pair file used to sign the UNL
   -c, --clean           Cleans up the generated files. NOTE: Do it only on
                         clean testnet, otherwise UNLs won't be validated
   -i, --generate-init-unl
@@ -61,7 +80,7 @@ optional arguments:
                         network initialization (testnet time=0)
   -t GENERATE_UNL_ON_TIME, --generate-unl-on-time GENERATE_UNL_ON_TIME
                         Generates the UNL files for all the validators for the
-                        given time. Time should be defined in XRPL Epoch
+                        given time. Time should be defined in Ripple Epoch
                         (secs since 01-01-2000)
 ```
 
