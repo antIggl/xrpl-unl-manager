@@ -9,7 +9,7 @@ import os
 import sched
 import json
 
-
+import time
 import daemon
 import signal
 import lockfile
@@ -237,15 +237,58 @@ if __name__=='__main__':
     # mdotg=mscV.getUNLGraphAtTime(0)
     # mdotg.render('./testout.gv',view=True)
 
+    #locking publish path
+    process_lock=lockfile.LockFile(config[config_section]['pid_file'][:-4]+'.lock')
+    # try:
+    #     process_lock.acquire()
+    # except lockfile.AlreadyLocked:
+    #     print("Another UNL-manager process is running!!!")
+    #     sys.exit(1)
+    # except lockfile.LockFailed:
+    #     print('Cannot create a lock file. Please check permissions.')
+    #     sys.exit(1)
+    # else:
+    #     print("Process lockfile created!!!")
+
+
     # Checking for single-task options
 
     if ('generate_init_unl' in config[config_section].keys()) and (config[config_section].getboolean('generate_init_unl')):
         print ("Generating init UNL files for all the validators.")
-        generateUNLsAtTime(msc,vtoken,config[config_section]['publish_path'],config[config_section]['keys_path'],0)
+        with process_lock:
+            generateUNLsAtTime(msc,vtoken,config[config_section]['publish_path'],config[config_section]['keys_path'],0)
 
     elif ('generate_unl_on_time' in config[config_section].keys()) and (config[config_section].getint('generate_unl_on_time')>=0) :
         print ("Generating UNL files for all the validators on specific time", config[config_section]['generate_unl_on_time'] )
-        generateUNLsAtTime(msc,vtoken,config[config_section]['publish_path'],config[config_section]['keys_path'],config[config_section].getint('generate_unl_on_time'))
+        with process_lock:
+            generateUNLsAtTime(msc,vtoken,config[config_section]['publish_path'],config[config_section]['keys_path'],config[config_section].getint('generate_unl_on_time'))
         
 
+    if "start" in config[config_section].keys() and config[config_section]["start"]:
+        
+        # Schedule the changes based on the scenario file.
+        unl_manager_scheduler=sched.scheduler(time.time, time.sleep)
+        start_time=time.time()
+        # keep start_time in status file
+        for st in msc.ordered_states:
+            unl_manager_scheduler.enterabs(start_time+int(st),1,generateUNLsAtTime,argument=(msc,vtoken,config[config_section]['publish_path'],config[config_section]['keys_path'],int(st)))
+
+        print ("Starting scheduler...")    
+        with process_lock:
+            unl_manager_scheduler.run()
+
+        print("Scenario Finished!!!")
+    elif "stop" in config[config_section].keys() and config[config_section]["stop"]:
+        print("Stopping process...")
+    elif "status" in config[config_section].keys() and config[config_section]["status"]:
+        print ("Printing status...")
+    elif "reload" in config[config_section].keys() and config[config_section]["reload"]:
+        print("Reloading config files...")
+    elif "restart" in config[config_section].keys() and config[config_section]["restart"]:
+        print("Restarting process....")
+    else:
+        print ("No daemon action has been passed.")
+
+    print("Bye bye!!!")
     
+
