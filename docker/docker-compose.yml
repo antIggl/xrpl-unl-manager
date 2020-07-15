@@ -1,0 +1,54 @@
+version: "3.7"
+
+networks:
+  testnet:
+    external: true
+    name: ${TESTNET_NAME:-ripple_testnet}
+
+volumes:
+  xrpl-unls-root:
+    external: true
+#  unl-publisher-config:
+
+services:
+  unl_publisher:
+    container_name: xrpl-unl-publisher
+    image: nginx
+    volumes:
+      - xrpl-unls-root:/usr/share/nginx/html:ro
+      - ${UNL_PUBLISHER_CONFIG:-./docker/nginx/conf.d}:/etc/nginx/conf.d:ro
+    networks:
+      -testnet
+#    ports:
+#      - 8880:80
+    expose:
+      - 80
+      
+  unl-manager:
+    container_name: xrpl-unl-manager
+    image: python:3
+    volumes:
+      - xrpl-unls-root : /app/unl-manager/pub_dir
+      - ./unl-manager.conf : /app/unl-manager/unl-manager.conf
+      - ./validator-token.txt : /app/unl-manager/unl-manager-token.txt
+    working_dir: /app
+#    tty: true
+    entrypoint: /app/docker/init_container.sh
+    command: ./unl_manager.py
+    deploy:
+      restart-policy:
+        condition: unless-stopped
+        max_attempts: 3
+        window: 180s
+    environment:
+      UNL_MANAGER_CONFIGFILE: /app/unl-manager/unl-manager.conf
+#      UNL_MANAGER_TOKEN: /app/unl-manager/unl-manager-token.txt
+      UNL_PUBLISH_PATH: /app/unl-manager/pub_dir/unls
+#      UNL_SCENARIO_FILE: /app/unl-manager/unlscenario.json
+      VALIDATORS_KEYS_PATH: /app/configfiles/
+#      UNL_VISUALIZATION_PATH: /app/unl-manager/pub_dir/graph/
+#      UNL_VISUALIZATION_FORMAT: "mermaid"
+      UNL_VISUALIZATION_FORMAT: "dot"
+#      UNL_VISUALIZATION_FORMAT: "JSON"
+      
+
