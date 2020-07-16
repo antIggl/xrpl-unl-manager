@@ -157,7 +157,7 @@ class ScenarioVisualizer():
         medges=""
         for v,o in validators_state.items():
             for pn in o['unl']:
-                medges+="%s --> %s \n".format(v,pn)
+                medges+="{0} --> {1}\n".format(v,pn)
 
         graphText=graphTemplate.replace("<edges>",medges)
         html = markdown.markdown(graphText, extensions=['md_mermaid'])
