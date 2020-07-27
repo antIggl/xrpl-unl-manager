@@ -147,25 +147,32 @@ if __name__=='__main__':
     argparser.add_argument("-log","--log-file",type=str, 
                                 help="Defines the working directory. ") #default='./',
 
-    argparser.add_argument("-conf","--config-file",type=str,default='./unl-manager.conf',
+    argparser.add_argument("-conf","--config-file",type=str,default=os.environ.get('UNL_MANAGER_CONFIGFILE') if os.environ.get('UNL_MANAGER_CONFIGFILE') else './unl-manager.conf',
                                 help="""Defines the configuration file.""")# + CONFIG_FILE_USE)
 
-    argparser.add_argument("-sc","--scenario-file",type=str, 
+    argparser.add_argument("-sc","--scenario-file",type=str, default=os.environ.get('UNL_SCENARIO_FILE') if os.environ.get('UNL_SCENARIO_FILE') else None ,
                                 help="Defines the scenario file to execute.") #default='./unl-manager/unlscenario.json',
-    argparser.add_argument("-p","--publish-path",type=str, 
+    argparser.add_argument("-p","--publish-path",type=str, default=os.environ.get('UNL_PUBLISH_PATH') if os.environ.get('UNL_PUBLISH_PATH') else None ,
                                 help="Defines the root of publish.") #default='./unl-manager/unls/',
-    argparser.add_argument("-k","--keys-path",type=str,
+    argparser.add_argument("-k","--keys-path",type=str,default=os.environ.get('VALIDATORS_KEYS_PATH') if os.environ.get('VALIDATORS_KEYS_PATH') else None ,
                                 help="Defines the root path for the validators key pairs") #, default='./configfiles/'
-    argparser.add_argument("-kf","--keys-file", type=str, help="Defines the keys-pair file used to sign the UNL")#, default='./unl-generator-token.txt'
+    argparser.add_argument("-kf","--keys-file", type=str, help="Defines the keys-pair file used to sign the UNL",
+                                default=os.environ.get('UNL_MANAGER_TOKEN') if os.environ.get('UNL_MANAGER_TOKEN') else None )#, default='./unl-generator-token.txt'
     argparser.add_argument("-c","--clean", help="Cleans up the generated files. NOTE: Do it only on clean testnet, otherwise UNLs won't be validated", action="store_true")
     gengroup=argparser.add_mutually_exclusive_group(required=False)
     gengroup.add_argument("-i","--generate-init-unl", help="Generates the UNL files for all the validators for the network initialization (testnet time=0)", action="store_true")
     gengroup.add_argument("-t","--generate-unl-on-time",type=int, help="Generates the UNL files for all the validators for the given time. Time should be defined in Ripple Epoch (secs since 01-01-2000)")
 
+    argparser.add_argument("-vp","--visualization-path",type=str,default=os.environ.get('UNL_VISUALIZATION_PATH') if os.environ.get('UNL_VISUALIZATION_PATH') else None ,
+                                help="Defines the root path for the vizualization output") 
+    argparser.add_argument("-vf","--visualization-format",type=str,default=os.environ.get('UNL_VISUALIZATION_FORMAT') if os.environ.get('UNL_VISUALIZATION_FORMAT') else "dot" ,
+                                help="Defines the format used for visualization (dot,JSON,mermaid)") 
+
     # ARGS_NOT_IN_CONFIG_FILE=set(['generate_init_unl','generate_unl_on_time','clean'])
 
     aa=argparser.parse_args()
-    # print (aa)
+    #print(aa) # prints all the arguments of the Argument parser
+    
     config=None
     config = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
     config_section='daemon' if aa.daemon else 'standalone'
