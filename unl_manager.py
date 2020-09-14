@@ -175,7 +175,7 @@ if __name__=='__main__':
     
     config=None
     config = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
-    config_section='daemon' if aa.daemon else 'standalone'
+    config_section='daemon' if aa.daemon and aa.daemon==True else 'standalone'
     # print (config_section)
 
     if aa.config_file and os.path.exists(aa.config_file):
