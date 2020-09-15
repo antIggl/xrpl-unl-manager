@@ -52,7 +52,7 @@ sleep 3
 if [[ -n $(docker container ls -q --filter=name=${UNL_PUBLISHER_CONTAINER_NAME}) ]]; then
   echo "   ${UNL_PUBLISHER_CONTAINER_NAME} is running.  OK"
   echo "  UNL manager container log: $(docker container logs xrpl-unl-manager)"
-else;
+else 
   echo "   ${UNL_PUBLISHER_CONTAINER_NAME} is not running.  FAIL!"
 fi;
 
