@@ -240,5 +240,8 @@ def createUNL(validators_names_list: list, validator_gen_keys: dict, version: in
         mSignK.sign(mblob_bin)).decode('ascii')
     munl['manifest'] = validator_gen_keys['manifest']
     munl['version'] = 1
-    munl['public_key'] = validator_gen_keys['public_key'].decode('ascii')
+    munl['public_key'] = base58ToHex(validator_gen_keys['public_key'].decode('ascii')).upper().decode('ascii')
+
+    # print("DEBUG: createUNL(): ", validator_gen_keys, munl)
+
     return munl
