@@ -15,7 +15,7 @@ set -x
 if [[ -n $TESTNET_NAME ]]; then
   running_testnet=$TESTNET_NAME
 else
-  running_testnet=$(docker network ls --filter=name=ripple-testnet --format "{{.Name}}" | head -n 1)
+  running_testnet=$(docker network ls --filter=name=${TESTNET_NAME} --format "{{.Name}}" | head -n 1)
 fi;
 
 if [[ -n $running_testnet ]] ; then
@@ -43,5 +43,18 @@ UNL_SCENARIO_FILE=${UNL_SCENARIO_FILE} \
 UNL_MANAGER_KEYFILE=${UNL_MANAGER_KEYFILE} \
 VALIDATORS_KEYS_PATH=${VALIDATORS_KEYS_PATH} \
     docker-compose -f ${DOCKER_COMPOSE_FILE} up -d
+
+
+
+echo "Waiting for everything goes up..."
+sleep 3
+
+if [[ -n $(docker container ls -q --filter=name=${UNL_PUBLISHER_CONTAINER_NAME}) ]]; then
+  echo "   ${UNL_PUBLISHER_CONTAINER_NAME} is running.  OK"
+  echo "  UNL manager container log: $(docker container logs xrpl-unl-manager)"
+else;
+  echo "   ${UNL_PUBLISHER_CONTAINER_NAME} is not running.  FAIL!"
+fi;
+
 
 set +x
