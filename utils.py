@@ -216,7 +216,7 @@ def createUNL(validators_names_list: list, validator_gen_keys: dict, version: in
     mblob_data['sequence'] = version
     # We set the expiration date to be 1 year after.
     td = time.mktime(time.strptime("19710101000000", "%Y%m%d%H%M%S"))
-    mblob_data['expiration'] = convertToRippleTime(time.time()) + td
+    mblob_data['expiration'] = int(convertToRippleTime(time.time()) + td)
     
     # print(mblob_data, type(mblob_data))
     mblob_bin = base64.b64encode(json.dumps(mblob_data).encode('ascii'))
