@@ -7,6 +7,8 @@ import json
 import os
 import pprint
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey, Ed25519PublicKey
+from cryptography.exceptions import InvalidSignature
+from cryptography.hazmat.primitives import serialization
 import time
 
 
@@ -147,6 +149,7 @@ def decodeValidatorToken(validator_token: str):
     vkeys = vtokenObj
     manif = decodeManifest(vtokenObj['manifest'])
     vkeys['public_key'] = manif['master_public_key']
+    vkeys['signing_public_key']=manif['signing_public_key']
     return vkeys
 
 
@@ -219,7 +222,9 @@ def createUNL(validators_names_list: list, validator_gen_keys: dict, version: in
     mblob_data['expiration'] = int(convertToRippleTime(time.time()) + td)
     
     # print(mblob_data, type(mblob_data))
-    mblob_bin = base64.b64encode(json.dumps(mblob_data).encode('ascii'))
+    mblob_bytes=json.dumps(mblob_data)
+    
+    mblob_bin = base64.b64encode(mblob_bytes.encode('ascii'))
     munl['blob'] = mblob_bin.decode('ascii')
 
     # mSecK=Ed25519PrivateKey.from_private_bytes(base58ToBytes(validator_gen_keys['secret_key']))
@@ -229,19 +234,62 @@ def createUNL(validators_names_list: list, validator_gen_keys: dict, version: in
     # munl['signature']=mSecK.sign(munl['blob'])
     signing_public_key = decodeManifest(validator_gen_keys['manifest'])[
         'signing_public_key']
+
+    print(len(base58ToBytes(signing_public_key)[1:]))    
+    # mprivk='pnjnsiZxWAHAVJnfvANBgdKKvRZqDpGRKsddvkU7q9xSbDUo3Fi'.encode('ascii')
+    # print ('secret key: ','pnjnsiZxWAHAVJnfvANBgdKKvRZqDpGRKsddvkU7q9xSbDUo3Fi'.encode('ascii'), len ('pnjnsiZxWAHAVJnfvANBgdKKvRZqDpGRKsddvkU7q9xSbDUo3Fi'.encode('ascii')))
+    # mSignK = Ed25519PrivateKey.from_private_bytes('pnjnsiZxWAHAVJnfvANBgdKKvRZqDpGRKsddvkU7q9xSbDUo3Fi')
+
+    print ("validation secret key:  ", binascii.unhexlify(validator_gen_keys['validation_secret_key']), len(binascii.unhexlify(validator_gen_keys['validation_secret_key'])))
     mSignK = Ed25519PrivateKey.from_private_bytes(
         binascii.unhexlify(validator_gen_keys['validation_secret_key']))
     # base58ToBytes(binascii.unhexlify(validator_gen_keys['validation_secret_key'])))
-    # mSignPubK=Ed25519PublicKey.from_public_bytes(base58ToBytes(signing_public_key))
+    mSignPubK=Ed25519PublicKey.from_public_bytes(base58ToBytes(signing_public_key)[1:])
 
     # man_signature=mSignK.sign(munl)#createManifestForSigning(sequence,public_key,signing_public_key))
+    
+    mSignPK = mSignK.public_key().public_bytes(serialization.Encoding.Raw, serialization.PublicFormat.Raw)
 
-    munl['signature'] = binascii.hexlify(
-        mSignK.sign(mblob_bin)).decode('ascii')
+    
+    print ("PublicKey for validation_secret_key :", mSignPK , bytesToBase58(b'\xed'+mSignPK),binascii.hexlify(mSignPK), len(mSignPK))
+    
+    print ("manifest signing public key: ", signing_public_key, mSignPubK.public_bytes(serialization.Encoding.Raw,serialization.PublicFormat.Raw))
+
+    print( "mblob bytes: ",mblob_bytes, type(mblob_bytes.encode('ascii')))
+    print("validator gen keys:",validator_gen_keys)
+    print(decodeManifest(validator_gen_keys['manifest']))
+    # munl['signature'] = binascii.hexlify(
+    #     mSignK.sign(mblob_bytes.encode('ascii'))).decode('ascii')
+    munl['signature'] = mSignK.sign(mblob_bytes.encode('ascii')).hex()
+    print("unl signature: ", munl['signature'], len(munl['signature']))
+
     munl['manifest'] = validator_gen_keys['manifest']
     munl['version'] = 1
     munl['public_key'] = base58ToHex(validator_gen_keys['public_key'].decode('ascii')).upper().decode('ascii')
 
-    # print("DEBUG: createUNL(): ", validator_gen_keys, munl)
+    print("DEBUG: createUNL(): ", validator_gen_keys, munl)
 
     return munl
+
+
+
+def validate(public_key, binary, signature):
+    """[summary]
+
+    Args:
+        public_key ([type]): [description]
+        binary ([type]): [description]
+        signature ([type]): [description]
+    """
+    # print(binascii.hexlify(public_key))
+    pk=Ed25519PublicKey.from_public_bytes(public_key[1:])
+
+    # print(binary)
+
+    try:
+        pk.verify(signature,data=binary)
+    except InvalidSignature :
+        print("Cannot be validated")
+        return False
+    print ('Validated!')
+    return True

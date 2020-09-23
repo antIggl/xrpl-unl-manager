@@ -17,12 +17,17 @@ argparser.add_argument("-v","--validate", default=False,action="store_true",
                             help="Enables the UNL validation during the decoding")
 pgroup=argparser.add_mutually_exclusive_group(required=False)
 pgroup.add_argument("-pb","--print-blob", help="Prints the UNL blob JSON object", action="store_true")
+pgroup.add_argument("-pr","--print-raw", help="Prints the UNL JSON object (RAW)", action="store_true")
+pgroup.add_argument("-prb","--print-raw-blob", help="Prints the UNL blob RAW", action="store_true")
 pgroup.add_argument("-pl","--print-validators-list", help="Prints the validators public keys list only", action="store_true")
 pgroup.add_argument("-pv","--print-validators", help="Prints the validators objects list only", action="store_true")
+pgroup.add_argument("-pm","--print-manifest", help="Prints the validators list manifest", action="store_true")
+pgroup.add_argument("-ps","--print-signature", help="Prints the validators list signature", action="store_true")
+
 argparser.add_argument("-o","--output-file", type=str,default='./decoded-list.json',help="Defines the output file.")
 
 aa=argparser.parse_args()
-print (aa)
+# print (aa)
 
 lfile='./encoded-list.json'
 vlistcont=None
@@ -38,16 +43,38 @@ else:
     else:
         print ("Error: no url")
 
-print(vlistcont)
+if aa.print_raw:
+    print(vlistcont)
 
 valist= utils.decodeValList(vlistcont)
+if aa.print_validators_list:
+    print(valist)
 
-print(valist)
+if aa.print_raw_blob:
+    print(vlistcont['blob'])
 
 list_blob = json.loads(base64.b64decode(vlistcont['blob']))
+if aa.print_blob:
+    print(list_blob)
 
-print(list_blob)
+# print (list_blob['validators'])
 
-print (list_blob['validators'])
+lman=utils.decodeManifest(vlistcont['manifest'])
+if aa.print_manifest :
+    # print("Printing decoded manifest of the list")
+    print (lman)
+    
+
+
+
+if aa.print_signature:
+    print(vlistcont['signature'])
+
 
 #TODO: verification
+
+# utils.validate(vlistcont['public_key'], base64.b64decode(vlistcont['blob']), vlistcont['signature'])
+import binascii
+utils.validate(utils.base58ToBytes(lman['signing_public_key']), base64.b64decode(vlistcont['blob']), binascii.unhexlify(vlistcont['signature']))
+
+utils.validate(binascii.unhexlify(vlistcont['public_key']), base64.b64decode(vlistcont['blob']), binascii.unhexlify(vlistcont['signature']))
