@@ -1,6 +1,6 @@
 base58==2.0.1
 cffi==1.14.0
-cryptography==2.9.2
+cryptography==3.2
 graphviz==0.14
 Markdown==3.2.2
 pycparser==2.20
