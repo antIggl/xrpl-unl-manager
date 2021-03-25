@@ -6,7 +6,7 @@ import utils
 import scenario_utils as scutils
 
 
-argparser=argparse.ArgumentParser(description="Manages the UNL files for a Ripple Testnet.")
+argparser=argparse.ArgumentParser(description="Manages the UNL files for an XRP Ledger Testnet.")
 cmdgroup=argparser.add_mutually_exclusive_group(required=False)
 cmdgroup.add_argument("--start", help="Starts running the scenario file.", action="store_true")
 cmdgroup.add_argument("--stop", help="Stops the running process on the same publish path", action="store_true")

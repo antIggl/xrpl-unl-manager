@@ -7,7 +7,7 @@ import json
 import urllib.request as ureq
 import base64
 
-argparser=argparse.ArgumentParser(description="Decodes a Ripple UNL either from a file or from a URL")
+argparser=argparse.ArgumentParser(description="Decodes an XRP Ledger UNL either from a file or from a URL")
 cmdgroup=argparser.add_mutually_exclusive_group(required=True)
 cmdgroup.add_argument("-f","--file", type=str, help="Defines the UNL file to be parsed")
 cmdgroup.add_argument("-u","--url", type=str, help="Defines the URL to retrieve the UNL file")
