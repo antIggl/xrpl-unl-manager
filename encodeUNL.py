@@ -5,7 +5,7 @@ import utils
 import json
 import os
 
-argparser=argparse.ArgumentParser(description="Encodes a Ripple UNL from a file containing either a JSON list or line-separated validator names")
+argparser=argparse.ArgumentParser(description="Encodes an XRP Ledger UNL from a file containing either a JSON list or line-separated validator names")
 argparser.add_argument("-f","--list-file", default='./unl-list.json', type=str, help="Defines the UNL file to be parsed")
 # cmdgroup.set_defaults()
 
