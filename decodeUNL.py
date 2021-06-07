@@ -77,4 +77,4 @@ if aa.print_signature:
 import binascii
 utils.validate(utils.base58ToBytes(lman['signing_public_key']), base64.b64decode(vlistcont['blob']), binascii.unhexlify(vlistcont['signature']))
 
-utils.validate(binascii.unhexlify(vlistcont['public_key']), base64.b64decode(vlistcont['blob']), binascii.unhexlify(vlistcont['signature']))
+# utils.validate(binascii.unhexlify(vlistcont['public_key']), base64.b64decode(vlistcont['blob']), binascii.unhexlify(vlistcont['signature']))
