@@ -4,7 +4,7 @@ import argparse
 import sys
 import utils
 import json
-import urllib.request as ureq
+import requests
 import base64
 
 argparser=argparse.ArgumentParser(description="Decodes an XRP Ledger UNL either from a file or from a URL")
@@ -33,8 +33,11 @@ if aa.file :
 else:
     # should be retrieved from url
     if len(aa.url)>0:
-        with ureq.urlopen(aa.url) as r:
-            vlistcont=json.load(r)
+        r = requests.get(aa.url)
+        if r.status_code == requests.codes.ok :
+            vlistcont=r.json()
+        else:
+            print("Could get a valid response from {} \n Response: {}".format(aa.url,r.status_code))
     else:
         print ("Error: no url")
 
@@ -51,3 +54,8 @@ print(list_blob)
 print (list_blob['validators'])
 
 #TODO: verification
+
+with open(aa.output_file,'w') as f:
+    json.dump(vlistcont,f)
+
+
