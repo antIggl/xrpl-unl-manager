@@ -53,21 +53,21 @@ if aa.print_raw:
 
 valist= utils.decodeValList(vlistcont)
 if aa.print_validators_list:
-    print(valist)
+    print(json.dumps(valist))
 
 if aa.print_raw_blob:
     print(vlistcont['blob'])
 
 list_blob = json.loads(base64.b64decode(vlistcont['blob']))
 if aa.print_blob:
-    print(list_blob)
+    print(json.dumps(list_blob))
 
 # print (list_blob['validators'])
 
 lman=utils.decodeManifest(vlistcont['manifest'])
 if aa.print_manifest :
     # print("Printing decoded manifest of the list")
-    print (lman)
+    print (json.dumps(lman))
 
 if aa.print_signature:
     print(vlistcont['signature'])
