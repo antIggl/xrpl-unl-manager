@@ -6,8 +6,7 @@ import utils
 import json
 import requests
 import base64
-import binascii
-from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey, Ed25519PublicKey
+
 
 argparser=argparse.ArgumentParser(description="Decodes an XRP Ledger UNL either from a file or from a URL")
 cmdgroup=argparser.add_mutually_exclusive_group(required=True)
@@ -15,19 +14,19 @@ cmdgroup.add_argument("-f","--file", type=str, help="Defines the UNL file to be 
 cmdgroup.add_argument("-u","--url", type=str, help="Defines the URL to retrieve the UNL file")
 # cmdgroup.set_defaults()
 
-argparser.add_argument("-v","--validate", default=False,action="store_true",
-                            help="Enables the UNL validation during the decoding")
+argparser.add_argument("-v","--verify", default=False,action="store_true",
+                            help="Enables the UNL verification with manifest and blob signatures during the decoding")
 pgroup=argparser.add_mutually_exclusive_group(required=False)
 pgroup.add_argument("-praw","--print-raw", help="Prints the UNL JSON as received", action="store_true")
 pgroup.add_argument("-pb","--print-blob", help="Prints the UNL blob JSON object", action="store_true")
-pgroup.add_argument("-pr","--print-raw", help="Prints the UNL JSON object (RAW)", action="store_true")
 pgroup.add_argument("-prb","--print-raw-blob", help="Prints the UNL blob RAW", action="store_true")
 pgroup.add_argument("-pl","--print-validators-list", help="Prints the validators public keys list only", action="store_true")
 pgroup.add_argument("-pv","--print-validators", help="Prints the validators objects list only", action="store_true")
 pgroup.add_argument("-pm","--print-manifest", help="Prints the validators list manifest", action="store_true")
 pgroup.add_argument("-ps","--print-signature", help="Prints the validators list signature", action="store_true")
 
-argparser.add_argument("-o","--output-file", type=str,default='./decoded-list.json',help="Defines the output file.")
+argparser.add_argument("-o","--output-file", type=str,default='./decoded-list-default.json',help="Defines the output file.")
+argparser.add_argument("-ro","--raw-output-file", type=str,help="Defines the raw output file, as received.")
 
 aa=argparser.parse_args()
 #print (aa)
@@ -74,32 +73,30 @@ if aa.print_signature:
     print(vlistcont['signature'])
 
 
-#TODO: verification
+if aa.raw_output_file:
+    with open(aa.raw_output_file,'w') as f:
+        json.dump(vlistcont,f)
 
-#print (vlistcont['public_key'], len(vlistcont['public_key']))
+if aa.output_file:
+    with open(aa.output_file,'w') as f:
+        json.dump(list_blob,f)
 
-#print (vlistcont['signature'], len(vlistcont['signature']))
+if aa.verify:
+    import binascii
+    mres=False
+    if utils.verifyManifest(vlistcont['manifest']) :
+        print (" UNL manifest verified successfully!")
+        mres=True
 
-#mPubK_bytes=binascii.a2b_hex(vlistcont['public_key'])
-#if mPubK_bytes[0]==0xed:
-#    print("ED key")
-#    mPubK=Ed25519PublicKey.from_public_bytes(mPubK_bytes[1:])
-#else:
-#    print ("Not a ED25519 key")
-#    sys.exit(1)
+    if utils.verify(utils.base58ToBytes(lman['signing_public_key']), base64.b64decode(vlistcont['blob']), binascii.a2b_hex(vlistcont['signature'])) :
+        print (" UNL blob verified successfully!")
+        #^^^ worked
+        mres|=True
+    
+    if mres:
+        print ("UNL verified successfully!")
+
+    #print ("verification:",utils.verifyUNL(vlistcont))
 
 
-# verifying
-#signature_bytes=binascii.a2b_hex(vlistcont['signature'])
-#verifying_data=base64.b64decode(vlistcont['blob']
-#verifying_data= bytes(vlistcont['blob'],'utf8')
-
-#mPubK.verify(signature_bytes,verifying_data)
-
-#mSignPubK=Ed25519PublicKey.from_public_bytes(base58ToBytes(signing_public_key))
-
-# utils.validate(vlistcont['public_key'], base64.b64decode(vlistcont['blob']), vlistcont['signature'])
-import binascii
-utils.validate(utils.base58ToBytes(lman['signing_public_key']), base64.b64decode(vlistcont['blob']), binascii.unhexlify(vlistcont['signature']))
-
-# utils.validate(binascii.unhexlify(vlistcont['public_key']), base64.b64decode(vlistcont['blob']), binascii.unhexlify(vlistcont['signature']))
+    

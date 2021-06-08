@@ -215,7 +215,7 @@ def encodeManifest(manifest_dict:dict):
     
 
     serializedManifest=seqbytes+mpkbytes+signpkbytes+domainbytes+msignaturebytes+signaturebytes
-    print(len(serializedManifest))
+    # print(len(serializedManifest))
 
     return base64.b64encode(serializedManifest)
 
@@ -256,7 +256,7 @@ def serializeManifestData(manifest_dict:dict):
         domainbytes=int.to_bytes(0x77,1,'big')+ int.to_bytes(len(dbytes),1,'big')+dbytes
     
     serializedManifest=seqbytes+mpkbytes+signpkbytes+domainbytes
-    print(len(serializedManifest))
+    # print(len(serializedManifest))
     
     return serializedManifest
 
@@ -265,31 +265,49 @@ def verifyManifest(manifest_blob):
 
     Args:
         manifest_blob ([type]): the blob of the manifest
+
+    Returns:
+        True : when validated both signatures
+        False: when not validated with either signature
     """
     manf_obj=decodeManifest(manifest_blob)
     serdata=serializeManifestData(manf_obj)
 
     mpubkeybytes= base58ToBytes(manf_obj['master_public_key'])
-    print(mpubkeybytes, mpubkeybytes[:1])
+    # print(mpubkeybytes, mpubkeybytes[:1], len(mpubkeybytes))
     if mpubkeybytes[:1]==b'\xed' :
         # it's ED25519 key
         mpubkey=Ed25519PublicKey.from_public_bytes(mpubkeybytes[1:])
-        mpubkey.verify(signature=binascii.unhexlify(manf_obj['master_signature']),data='MAN'.encode('ascii')+serdata)
-        # mpubkey.verify(signature=binascii.unhexlify(manf_obj['master_signature']),data=serdata)
+        try:
+            mpubkey.verify(signature=binascii.unhexlify(manf_obj['master_signature']),data='MAN\0'.encode('ascii')+serdata)
+        except InvalidSignature:
+            print("Unabled to verify!")
+            return False
     else:
         mpubkey=ec.EllipticCurvePublicKeyWithSerialization.from_encoded_point(curve=ec.SECP256K1(), data=mpubkeybytes)
-        mpubkey.verify(signature=binascii.unhexlify(manf_obj['master_signature']),data=serdata, signature_algorithm=ec.ECDSA(hashes.SHA256()))
-    
+        try:
+            mpubkey.verify(signature=binascii.unhexlify(manf_obj['master_signature']),data=serdata, signature_algorithm=ec.ECDSA(hashes.SHA256()))
+        except InvalidSignature:
+            print("Unabled to verify!")
+            return False
 
     spubkeybytes= base58ToBytes(manf_obj['signing_public_key'])
     if spubkeybytes[:1]==b'\xed' :
         # it's ED25519 key
         spubkey=Ed25519PublicKey.from_public_bytes(spubkeybytes[1:])
-        spubkey.verify(signature=binascii.unhexlify(manf_obj['signature']),data=serdata)
+        try:
+            spubkey.verify(signature=binascii.unhexlify(manf_obj['signature']),data='MAN\0'.encode('ascii')+serdata)
+        except InvalidSignature:
+            print("Unabled to verify!")
+            return False
     else:
         spubkey=ec.EllipticCurvePublicKeyWithSerialization.from_encoded_point(curve=ec.SECP256K1(), data=spubkeybytes)
-        spubkey.verify(signature=binascii.unhexlify(manf_obj['signature']),data=serdata, signature_algorithm=ec.ECDSA(hashes.SHA256()))
-    
+        try:
+            spubkey.verify(signature=binascii.unhexlify(manf_obj['signature']),data=serdata, signature_algorithm=ec.ECDSA(hashes.SHA256()))
+        except InvalidSignature:
+            print("Unabled to verify!")
+            return False
+
     return True
     
 
@@ -503,8 +521,18 @@ def createUNL(validators_names_list: list, validator_gen_keys: dict, version: in
     return munl
 
 
+def verifyUNL(unl:str):
+    """
+    Verifies the UNL against the signing public key and the signatures for both blob and manifest.
+    """
+    lman=decodeManifest(unl['manifest'])
+    mres=False
+    mres=verifyManifest(unl['manifest'])
+    mres&=verify(base58ToBytes(lman['signing_public_key']), base64.b64decode(unl['blob']), binascii.a2b_hex(unl['signature']))
+    
+    return mres
 
-def validate(public_key, binary, signature):
+def verify(public_key, binary, signature):
     """[summary]
 
     Args:
@@ -513,10 +541,10 @@ def validate(public_key, binary, signature):
         signature ([type]): [description]
     """
     # print(binascii.hexlify(public_key))
-    is_ed25519=(public_key[:1]==0xed)
+    is_ed25519=(public_key[0]==0xed)
 
     if is_ed25519:
-        print ("It's ED25519 key")
+        # print ("It's ED25519 key")
         pk=Ed25519PublicKey.from_public_bytes(public_key[1:])
         # print(binary)
 
@@ -525,14 +553,14 @@ def validate(public_key, binary, signature):
         except InvalidSignature :
             print("Cannot be validated")
             return False
-        print ('Validated!')
+        # print ('Validated!')
         return True
     else:
         mpubkey=ec.EllipticCurvePublicKeyWithSerialization.from_encoded_point(curve=ec.SECP256K1(), data=public_key)
         try:
             mpubkey.verify(signature=signature,data=binary, signature_algorithm=ec.ECDSA(hashes.SHA256()))
         except InvalidSignature :
-            print("Cannot be validated444")
+            print("Cannot be validated")
             return False
-        print ('Validated!')
+        # print ('Validated!')
         return True
