@@ -5,3 +5,4 @@ graphviz==0.14
 Markdown==3.2.2
 pycparser==2.20
 six==1.15.0
+requests==2.25.1
