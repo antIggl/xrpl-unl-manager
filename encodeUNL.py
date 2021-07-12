@@ -55,6 +55,7 @@ if __name__=='__main__':
 
     argparser=argparse.ArgumentParser(description="Encodes a Ripple UNL from a file containing either a JSON list or line-separated validator names")
     argparser.add_argument("-f","--list-file", default='./unl-list.json', type=str, help="Defines the UNL file to be parsed")
+    argparser.add_argument("-bf","--bloblist-file", type=str, help="Defines the UNL blob list file to be parsed")
     # cmdgroup.set_defaults()
 
     argparser.add_argument("-v","--version", default=1,type=int,
@@ -68,9 +69,10 @@ if __name__=='__main__':
     # print (aa,aa.keys_file)  
     vtoken=parseValidatorTokenFile(aa.keys_file)
     # print(vtoken)
-
-    mvallist=parseListFile(aa.list_file)
-    # print(mvallist)
+    mvallist=[]
+    if not aa.bloblist_file :
+        mvallist=parseListFile(aa.list_file)
+        print(mvallist)
 
     vkpath=os.path.abspath(aa.validators_keys_path)
     # print(vkpath)
@@ -79,7 +81,16 @@ if __name__=='__main__':
 
     # print(aa.output_file)
 
-    munl=utils.createUNL(mvallist,vtoken,aa.version,vkpath)
+    # munl=utils.createUNL(mvallist,vtoken,aa.version,vkpath)
+    mblobvallist={}
+    if aa.bloblist_file:
+        with open(aa.bloblist_file,'r')as f:
+            mblobvallist= json.load(f) 
+
+    print (mblobvallist)
+
+    munl={}
+    munl=utils.createUNL_from_blob(mblobvallist,vtoken,aa.version,vkpath)
     # print(munl)
     # print (json.dumps(munl))
 
