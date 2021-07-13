@@ -319,9 +319,9 @@ def verifyManifest(manifest_blob):
         #     return False
         pubkey_point = _CURVE.decode_point(mpubkeybytes)
         mpubkey=ECPublicKey(pubkey_point)
-        res=_SIGNER.verify(sha512_first_half(serdata),manf_obj['master_signature'],mpubkey)
+        res=_SIGNER.verify(sha512_first_half('MAN\0'.encode('ascii')+serdata),manf_obj['master_signature'],mpubkey)
         if not res:
-            print("Failed to verify")
+            print("Failed to verify",res)
             return False
 
     spubkeybytes= base58ToBytes(manf_obj['signing_public_key'])
@@ -349,9 +349,9 @@ def verifyManifest(manifest_blob):
 
         pubkey_point = _CURVE.decode_point(spubkeybytes)
         spubkey=ECPublicKey(pubkey_point)
-        res=_SIGNER.verify(sha512_first_half(serdata),manf_obj['signature'],spubkey)
+        res=_SIGNER.verify(sha512_first_half('MAN\0'.encode('ascii')+serdata),manf_obj['signature'],spubkey)
         if not res:
-            print("Failed to verify")
+            print("Failed to verify",res)
             return False
 
 
@@ -368,7 +368,7 @@ def signManifest(manifest_dict:dict, master_private_key, signing_private_key):
         signing_private_key ([type]): [description]
     """
 
-    serdata=serializeManifestData(manifest_dict)
+    serdata='MAN\0'.encode('ascii')+serializeManifestData(manifest_dict)
 
     mpubkeybytes= base58ToBytes(manifest_dict['master_public_key'])
     if mpubkeybytes[:1]==b'\xed' :
@@ -594,7 +594,7 @@ def createUNL_from_blob(blob_dict,validator_gen_keys:dict, version:dict, keys_pa
     return munl
 
 
-def createUNL(validators_names_list: list, validator_gen_keys: dict, version: int, keys_path: str):
+def createUNL(validators_names_list: list, validator_gen_keys: dict, version: int, keys_path: str,expiration_date:float=None):
     """Creates a properly signed UNL that contains only the validators in the validators_names_list
 
     Arguments:
@@ -603,16 +603,20 @@ def createUNL(validators_names_list: list, validator_gen_keys: dict, version: in
         ephemeral_keys {dict} -- [description]
         version {int} -- [description]
         keys_path {str} -- the root path for the validators keys
+        expiration_date {float} -- expiration date in seconds since unix epoch
     """
     munl = {}
     mblob_data = {}
     mblob_data['validators'] = createValidatorsList(
         validators_names_list, keys_path)
     mblob_data['sequence'] = version
-    # We set the expiration date to be 1 year after.
-    td = time.mktime(time.strptime("19710101000000", "%Y%m%d%H%M%S"))
-    mblob_data['expiration'] = int(convertToRippleTime(time.time()) + td)
-    
+    if expiration_date==None:
+        # We set the expiration date to be 1 year after.
+        td = time.mktime(time.strptime("19710101000000", "%Y%m%d%H%M%S"))
+        mblob_data['expiration'] = int(convertToRippleTime(time.time()) + td)
+    else:
+        mblob_data['expiration'] = int(convertToRippleTime(expiration_date))
+            
     # print(mblob_data, type(mblob_data))
     mblob_bytes=json.dumps(mblob_data)
     
