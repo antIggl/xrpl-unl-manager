@@ -95,10 +95,12 @@ if aa.verify:
     if utils.verify(utils.base58ToBytes(lman['signing_public_key']), base64.b64decode(vlistcont['blob']), binascii.a2b_hex(vlistcont['signature'])) :
         print (" UNL blob verified successfully!")
         #^^^ worked
-        mres|=True
+        mres&=True
     
     if mres:
         print ("UNL verified successfully!")
+    else:
+        print ("UNL could not get verified!!!")
 
     #print ("verification:",utils.verifyUNL(vlistcont))
 

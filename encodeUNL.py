@@ -91,9 +91,12 @@ if __name__=='__main__':
 
     munl={}
     munl=utils.createUNL_from_blob(mblobvallist,vtoken,aa.version,vkpath)
-    # print(munl)
+    print(munl, type(munl))
     # print (json.dumps(munl))
+    for k in munl.keys():
+        print (k,type(munl[k]))
 
+    
     with open(aa.output_file,'w') as f:
         json.dump(munl,f)
 
