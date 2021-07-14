@@ -10,13 +10,7 @@ import cryptography
 
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey, Ed25519PublicKey
 from cryptography.exceptions import InvalidSignature
-#from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import ec
-#from cryptography.hazmat.primitives import hashes
-#from cryptography.hazmat.backends import default_backend
-#from cryptography.hazmat.backends.openssl import backend as openssl_backend
-#from cryptography.hazmat.backends.openssl import backend
-# from cryptography.hazmat.backends.interfaces import DSABackend, DERSerializationBackend
 
 from ecpy.curves import Curve
 from ecpy.ecdsa import ECDSA
@@ -69,7 +63,6 @@ def base58ToBytes(b58_str):
     payload_unhex = decb58[:-4]
     checksum = decb58[-4:]
     payload_hex = binascii.hexlify(payload_unhex)
-    #print("payloadstr : ",payload_hex[2:])
     check = (checksum == doubleSha256(payload_hex)[0:4])
     if not check:
         print("Checksum check: ", (check))
@@ -138,17 +131,14 @@ def decodeManifest(manifest_blob):
 
     while len(manifest_bytes) > 0:
         mtypefield, data, manifest_bytes = decodeNextField(manifest_bytes)
-        # print(type(mtypefield))
         if type(mtypefield) == bytes:
             mtypefield = int.from_bytes(mtypefield, 'big')
 
         if mtypefield == 0x24:
             manifest_dec['sequence'] = int.from_bytes(data, 'big')
         elif mtypefield == 0x71:
-            # binascii.hexlify(data)#hexToBase58(binascii.hexlify(data))#base58ToHex(data)#
             manifest_dec['master_public_key'] = bytesToBase58(data)
         elif mtypefield == 0x73:
-            # binascii.hexlify(data)#hexToBase58(binascii.hexlify(data))#base58ToHex(data)#hexToBase58(data)
             manifest_dec['signing_public_key'] = bytesToBase58(data)
         elif mtypefield == 0x76:
             manifest_dec['signature'] = binascii.b2a_hex(data)#.hexlify(data)#data.hex()#
@@ -236,7 +226,6 @@ def encodeManifest(manifest_dict:dict):
     
     # order: Seq, MPUBKEY,SPUBKEY,SIGNATURE,DOMAIN,MASTER_SIGNATURE
     serializedManifest=seqbytes+mpkbytes +signpkbytes+signaturebytes+domainbytes+msignaturebytes#
-    # print(len(serializedManifest))
 
     return base64.b64encode(serializedManifest)
 
@@ -273,7 +262,7 @@ def serializeManifestData(manifest_dict:dict):
     
     domainbytes=b''
     if 'domain' in manifest_dict.keys():
-        print(manifest_dict['domain'])
+        # print(manifest_dict['domain'])
         dbytes=manifest_dict['domain']#.encode('ascii') #binascii.a2b_hex()
         domainbytes=int.to_bytes(0x77,1,'big')+ int.to_bytes(len(dbytes),1,'big')+dbytes
     
@@ -306,19 +295,7 @@ def verifyManifest(manifest_blob):
             print("Unabled to verify!")
             return False
     else:
-        # mpubkey=cryptography.hazmat.primitives.serialization.load_der_public_key(data=mpubkeybytes)
-        # print ("is mpubkey1 EllipticCurvePublicKey?  ", isinstance(mpubkey,ec.EllipticCurvePublicKey))
-
-        # mpubkey1=ec.EllipticCurvePublicKeyWithSerialization.from_encoded_point(curve=ec.SECP256K1(), data=mpubkeybytes)
-        # print (" KEYS COMP: {} \t {}".format(mpubkey,mpubkey1))
-
-        # try:
-        #     # mpubkey.verify(signature=binascii.unhexlify(manf_obj['master_signature']),data=serdata, signature_algorithm=ec.ECDSA(hashes.SHA512_256()))
-        #     mpubkey.verify(signature=binascii.unhexlify(manf_obj['master_signature']),data='MAN\0'.encode('ascii')+serdata, signature_algorithm=ec.ECDSA(SHA512half()))
-        # except InvalidSignature:
-        #     print("Unabled to verify!")
-        #     return False
-        print ("IT'S a ECDSA key")
+        # print ("IT'S a ECDSA key")
         pubkey_point = _CURVE.decode_point(mpubkeybytes)
         mpubkey=ECPublicKey(pubkey_point)
         res=_SIGNER.verify('MAN\0'.encode('ascii')+serdata,binascii.unhexlify(manf_obj['master_signature']),mpubkey) #sha512_first_half('MAN\0'.encode('ascii')+serdata)
@@ -336,19 +313,7 @@ def verifyManifest(manifest_blob):
             print("Unabled to verify!")
             return False
     else:
-        # spubkey=cryptography.hazmat.primitives.serialization.load_der_public_key(data=spubkeybytes)
-        # print ("is mpubkey1 EllipticCurvePublicKey?  ", isinstance(spubkey,ec.EllipticCurvePublicKey))
-
-        # spubkey1=ec.EllipticCurvePublicKeyWithSerialization.from_encoded_point(curve=ec.SECP256K1(), data=spubkeybytes)
-        # print (" KEYS COMP: {} \t {}".format(spubkey,spubkey1))
-
-        # try:
-        #     # spubkey.verify(signature=binascii.unhexlify(manf_obj['signature']),data='MAN\0'.encode('ascii')+serdata, signature_algorithm=ec.ECDSA(hashes.SHA512_256()))
-        #     spubkey.verify(signature=binascii.unhexlify(manf_obj['signature']),data='MAN\0'.encode('ascii')+serdata, signature_algorithm=ec.ECDSA(SHA512half()))
-        # except InvalidSignature:
-        #     print("Unabled to verify!")
-        #     return False
-        print ("IT'S a ECDSA key")
+        # print ("IT'S a ECDSA key")
         pubkey_point = _CURVE.decode_point(spubkeybytes)
         spubkey=ECPublicKey(pubkey_point)
         res=_SIGNER.verify(sha512_first_half('MAN\0'.encode('ascii')+serdata),binascii.unhexlify(manf_obj['signature']),spubkey)
@@ -383,19 +348,12 @@ def signManifest(manifest_dict:dict, master_private_key, signing_private_key):
         mpubkey.verify(signature=binascii.unhexlify(manifest_dict['master_signature']),data=serdata)
     else:
         if type(master_private_key, ec.EllipticCurvePrivateKey ):
-            # manifest_dict['master_signature']=binascii.hexlify(master_private_key.sign(data=serdata, signature_algorithm=ec.ECDSA(hashes.SHA256())))
-            # manifest_dict['master_signature']=binascii.hexlify(master_private_key.sign(data=serdata, signature_algorithm=ec.ECDSA(SHA512half())))
-            print ("IT'S a ECDSA key")
+            # print ("IT'S a ECDSA key")
             manifest_dict['master_signature']=binascii.hexlify(_SIGNER.sign_rfc6979(serdata,master_private_key,sha256,canonical=True))
-        
 
         if type(master_private_key, Ed25519PrivateKey ):
             print("master private key type is not the same as master public key")
 
-        #mpubkey=ec.EllipticCurvePublicKeyWithSerialization.from_encoded_point(curve=ec.SECP256K1(), data=mpubkeybytes)
-        #mpubkey=cryptography.hazmat.primitives.serialization.load_der_public_key(data=mpubkeybytes)
-        ## mpubkey.verify(signature=binascii.unhexlify(manifest_dict['master_signature']),data=serdata, signature_algorithm=ec.ECDSA(hashes.SHA256()))
-        #mpubkey.verify(signature=binascii.unhexlify(manifest_dict['master_signature']),data=serdata, signature_algorithm=ec.ECDSA(SHA512half()))
         pubkey_point = _CURVE.decode_point(mpubkeybytes)
         mpubkey=ECPublicKey(pubkey_point)
         res=_SIGNER.verify(sha512_first_half(serdata),manifest_dict['master_signature'],mpubkey)
@@ -415,18 +373,12 @@ def signManifest(manifest_dict:dict, master_private_key, signing_private_key):
         spubkey.verify(signature=binascii.unhexlify(manifest_dict['signature']),data=serdata)
     else:
         if type(signing_private_key, ec.EllipticCurvePrivateKey ):
-            # manifest_dict['signature']=binascii.hexlify(signing_private_key.sign(data=serdata, signature_algorithm=ec.ECDSA(hashes.SHA256())))
-            # manifest_dict['signature']=binascii.hexlify(signing_private_key.sign(data=serdata, signature_algorithm=ec.ECDSA(SHA512half())))
             manifest_dict['signature']=binascii.hexlify(_SIGNER.sign_rfc6979(serdata,signing_private_key,sha256,canonical=True))
-            print ("IT'S a ECDSA key")
+            # print ("IT'S a ECDSA key")
 
         if type(signing_private_key, Ed25519PrivateKey):
             print("signing private key type is not the same as signing public key")
 
-        #spubkey=ec.EllipticCurvePublicKeyWithSerialization.from_encoded_point(curve=ec.SECP256K1(), data=spubkeybytes)
-        # spubkey.verify(signature=binascii.unhexlify(manifest_dict['signature']),data=serdata, signature_algorithm=ec.ECDSA(hashes.SHA256()))
-        #spubkey=cryptography.hazmat.primitives.serialization.load_der_public_key(data=spubkeybytes)
-        #spubkey.verify(signature=binascii.unhexlify(manifest_dict['signature']),data=serdata, signature_algorithm=ec.ECDSA(SHA512half()))
         pubkey_point = _CURVE.decode_point(spubkeybytes)
         spubkey=ECPublicKey(pubkey_point)
         res=_SIGNER.verify(sha512_first_half(serdata),manifest_dict['signature'],spubkey)
@@ -502,7 +454,7 @@ def convertToUnixTime(rtstamp):
 
 
 
-def createUNL_from_blob(blob_dict,validator_gen_keys:dict, version:dict, keys_path:str):
+def createUNL_from_blob(blob_dict,validator_gen_keys:dict):
     """
     Creates a properly signed UNL with the blob_dict.
     """
@@ -511,46 +463,21 @@ def createUNL_from_blob(blob_dict,validator_gen_keys:dict, version:dict, keys_pa
     mblob_bin = base64.b64encode(mblob_bytes.encode('ascii'))
     munl['blob']=mblob_bin.decode('ascii')
 
-    # munl['signature']=mSecK.sign(munl['blob'])
     signing_public_key = decodeManifest(validator_gen_keys['manifest'])[
         'signing_public_key']
-
-    print(len(base58ToBytes(signing_public_key)[1:]))    
-    # mprivk='pnjnsiZxWAHAVJnfvANBgdKKvRZqDpGRKsddvkU7q9xSbDUo3Fi'.encode('ascii')
-    # print ('secret key: ','pnjnsiZxWAHAVJnfvANBgdKKvRZqDpGRKsddvkU7q9xSbDUo3Fi'.encode('ascii'), len ('pnjnsiZxWAHAVJnfvANBgdKKvRZqDpGRKsddvkU7q9xSbDUo3Fi'.encode('ascii')))
-    # mSignK = Ed25519PrivateKey.from_private_bytes('pnjnsiZxWAHAVJnfvANBgdKKvRZqDpGRKsddvkU7q9xSbDUo3Fi')
-
-    print ("validation secret key:  ", binascii.unhexlify(validator_gen_keys['validation_secret_key']), len(binascii.unhexlify(validator_gen_keys['validation_secret_key'])))
     
     is_ed25519=(signing_public_key[0]==0xed)
     if is_ed25519:
-        print ("IT'S ED25519 key")
+        # print ("IT'S ED25519 key")
         mSignK = Ed25519PrivateKey.from_private_bytes( binascii.unhexlify(validator_gen_keys['validation_secret_key']))
-        # base58ToBytes(binascii.unhexlify(validator_gen_keys['validation_secret_key'])))
         mSignPubK=Ed25519PublicKey.from_public_bytes(base58ToBytes(signing_public_key)[1:])
-        # munl['signature'] = binascii.hexlify(
-        #     mSignK.sign(mblob_bytes.encode('ascii'))).decode('ascii')
         munl['signature'] = mSignK.sign(mblob_bytes.encode('ascii')).hex().upper()
     else:
-        print ("IT'S a ECDSA key")
-        #backend=default_backend() backend=DSABackend()
-        # mSignK = ec.derive_private_key(backend=default_backend(), curve=ec.SECP256K1(),
-        #             private_value=int.from_bytes(bytes().fromhex(validator_gen_keys['validation_secret_key']),byteorder='big') )
-
-        # mSignPubK = ec.EllipticCurvePublicKeyWithSerialization.from_encoded_point(curve=ec.SECP256K1(),data=base58ToBytes(signing_public_key))
-        # mSignK = cryptography.hazmat.primitives.serialization.load_der_private_key(data=bytes().fromhex(validator_gen_keys['validation_secret_key']),
-        #                                 password=None, backend=default_backend())#openssl_backend)
-        # mSignPubK = cryptography.hazmat.primitives.serialization.load_der_public_key(data=base58ToBytes(signing_public_key))
-        
+        # print ("IT'S a ECDSA key")
         ### Important info:
         # line:987 https://github.com/ripple/rippled/blob/develop/src/ripple/app/misc/impl/ValidatorList.cpp
         # The hashing algorithm for the fullhash is sha512half --> SHA512_256()<--- WRONG!!! it's first half of SHA512
         #############
-        # munl['signature'] = mSignK.sign(data= mblob_bytes.encode('ascii'),
-        #     signature_algorithm=ec.ECDSA(hashes.SHA512_256())).hex().capitalize()
-        # munl['signature'] = mSignK.sign(data= mblob_bytes.encode('ascii'),
-        #     signature_algorithm=ec.ECDSA(SHA512half())).hex().capitalize()
-        
         # use ECPY
         mSignK = ECPrivateKey(int(validator_gen_keys['validation_secret_key'],16),_CURVE)
         pubkey_point=_CURVE.decode_point(base58ToBytes(signing_public_key))
@@ -558,35 +485,9 @@ def createUNL_from_blob(blob_dict,validator_gen_keys:dict, version:dict, keys_pa
         munl['signature'] = _SIGNER.sign_rfc6979(sha512_first_half(mblob_bytes.encode('ascii')),mSignK,sha256,canonical=True).hex().upper()
         
 
-
-        
-
-        # print("\n\n\n TESTING HASHES :\n {},\n {},\n {} \n\n\n".format(
-        #      mSignK.sign(data= mblob_bytes.encode('ascii'),signature_algorithm=ec.ECDSA(hashes.SHA512())).hex(),
-        #      mSignK.sign(data= mblob_bytes.encode('ascii'),signature_algorithm=ec.ECDSA(hashes.SHA512_256())).hex(),
-        #      mSignK.sign(data= mblob_bytes.encode('ascii'),signature_algorithm=ec.ECDSA(SHA512half())).hex())) #,\n {},\n {},\n {},\n {},\n {},\n {}
-        #     mSignK.sign(data= mblob_bytes.encode('ascii'),signature_algorithm=ec.ECDSA(hashes.SHA512_224())).hex(),
-        #     mSignK.sign(data= mblob_bytes.encode('ascii'),signature_algorithm=ec.ECDSA(hashes.SHA3_256())).hex(),
-        #     mSignK.sign(data= mblob_bytes.encode('ascii'),signature_algorithm=ec.ECDSA(hashes.SHA3_512())).hex(),
-        #     mSignK.sign(data= mblob_bytes.encode('ascii'),signature_algorithm=ec.ECDSA(hashes.SHAKE256(digest_size=140))).hex(),
-        #     mSignK.sign(data= mblob_bytes.encode('ascii'),signature_algorithm=ec.ECDSA(hashes.SHA256())).hex(),
-        #     mSignK.sign(data= mblob_bytes.encode('ascii'),signature_algorithm=ec.ECDSA(hashes.SHA384())).hex(),
-        #     mSignK.sign(data= mblob_bytes.encode('ascii'),signature_algorithm=ec.ECDSA(hashes.SHA1())).hex()
-        #         ))
-
-        # .sign(mblob_bytes.encode('ascii')).hex()
-    # man_signature=mSignK.sign(munl)#createManifestForSigning(sequence,public_key,signing_public_key))
-    
-    # mSignPK = mSignK.public_key().public_bytes(serialization.Encoding.Raw, serialization.PublicFormat.Raw)
-
-    
-#    print ("PublicKey for validation_secret_key :", mSignPK , bytesToBase58(b'\xed'+mSignPK),binascii.hexlify(mSignPK), len(mSignPK))
-    
-#    print ("manifest signing public key: ", signing_public_key, mSignPubK.public_bytes(serialization.Encoding.Raw,serialization.PublicFormat.Raw))
-
-    print( "\nmblob bytes: ",mblob_bytes, type(mblob_bytes.encode('ascii')))
-    print("\nvalidator gen keys:",validator_gen_keys)
-    print("\n manifest: ", decodeManifest(validator_gen_keys['manifest']))
+    # print( "\nmblob bytes: ",mblob_bytes, type(mblob_bytes.encode('ascii')))
+    # print("\nvalidator gen keys:",validator_gen_keys)
+    # print("\n manifest: ", decodeManifest(validator_gen_keys['manifest']))
     
     #print("unl signature: ", munl['signature'], len(munl['signature']))
 
@@ -594,10 +495,68 @@ def createUNL_from_blob(blob_dict,validator_gen_keys:dict, version:dict, keys_pa
     munl['version'] = 1
     munl['public_key'] = base58ToHex(validator_gen_keys['public_key'].decode('ascii')).upper().decode('ascii')
 
-    print("\nDEBUG: createUNL(): ", validator_gen_keys, munl)
+    # print("\nDEBUG: createUNL(): ", validator_gen_keys, munl)
 
     return munl
 
+def createUNL_from_bloblist(bloblist: list, validator_gen_keys: dict, version: int,expiration_date:float=None):
+    """
+    Creates a properly signed UNL using the bloblist for "validators" key in blob. 
+    It sets the version/sequence of the UNL and the expiration date.
+
+    """
+    munl = {}
+    mblob_data = {}
+    mblob_data['validators'] = bloblist
+    mblob_data['sequence'] = version
+    if expiration_date==None:
+        # We set the expiration date to be 1 year after.
+        td = time.mktime(time.strptime("19710101000000", "%Y%m%d%H%M%S"))
+        mblob_data['expiration'] = int(convertToRippleTime(time.time()) + td)
+    else:
+        mblob_data['expiration'] = int(convertToRippleTime(expiration_date))
+
+    # print(mblob_data, type(mblob_data))
+    mblob_bytes=json.dumps(mblob_data)
+    
+    mblob_bin = base64.b64encode(mblob_bytes.encode('ascii'))
+    munl['blob'] = mblob_bin.decode('ascii')
+
+    signing_public_key = decodeManifest(validator_gen_keys['manifest'])['signing_public_key']
+    is_ed25519=(signing_public_key[0]==0xed)
+    if is_ed25519:
+        # print ("IT'S ED25519 key")
+        mSignK = Ed25519PrivateKey.from_private_bytes( binascii.unhexlify(validator_gen_keys['validation_secret_key']))
+        mSignPubK=Ed25519PublicKey.from_public_bytes(base58ToBytes(signing_public_key)[1:])
+        
+        munl['signature'] = mSignK.sign(mblob_bytes.encode('ascii')).hex().upper()
+    else:
+        # print ("IT'S a ECDSA key")
+        ### Important info:
+        # line:987 https://github.com/ripple/rippled/blob/develop/src/ripple/app/misc/impl/ValidatorList.cpp
+        # The hashing algorithm for the fullhash is sha512half --> SHA512_256()<--WRONG, It's first half of SHA512
+                
+        # using ECPY 
+        mSignK = ECPrivateKey(int(validator_gen_keys['validation_secret_key'],16),_CURVE)
+        pubkey_point=_CURVE.decode_point(base58ToBytes(signing_public_key))
+        mSignPubK=ECPublicKey(pubkey_point)
+        munl['signature'] = _SIGNER.sign_rfc6979(sha512_first_half(mblob_bytes.encode('ascii')),mSignK,sha256,canonical=True).hex().upper()
+        
+    # print( "\nmblob bytes: ",mblob_bytes, type(mblob_bytes.encode('ascii')))
+    # print("\nvalidator gen keys:",validator_gen_keys)
+    # print("\n manifest: ", decodeManifest(validator_gen_keys['manifest']))
+    
+    #print("unl signature: ", munl['signature'], len(munl['signature']))
+
+    munl['manifest'] = validator_gen_keys['manifest']
+    munl['version'] = 1
+    munl['public_key'] = base58ToHex(validator_gen_keys['public_key'].decode('ascii')).upper().decode('ascii')
+
+    # print("\nDEBUG: createUNL(): ", validator_gen_keys, munl)
+
+    return munl
+
+    
 
 def createUNL(validators_names_list: list, validator_gen_keys: dict, version: int, keys_path: str,expiration_date:float=None):
     """Creates a properly signed UNL that contains only the validators in the validators_names_list
@@ -622,69 +581,27 @@ def createUNL(validators_names_list: list, validator_gen_keys: dict, version: in
     else:
         mblob_data['expiration'] = int(convertToRippleTime(expiration_date))
 
-    # print(mblob_data, type(mblob_data))
     mblob_bytes=json.dumps(mblob_data)
     
     mblob_bin = base64.b64encode(mblob_bytes.encode('ascii'))
     munl['blob'] = mblob_bin.decode('ascii')
 
-    # mSecK=Ed25519PrivateKey.from_private_bytes(base58ToBytes(validator_gen_keys['secret_key']))
-    # mPubK=Ed25519PublicKey.from_public_bytes(base58ToBytes(validator_gen_keys['public_key']))
-    # man_master_signature=mSecK.sign(munl['blob'])#createManifestForSigning(sequence,public_key,signing_public_key))
-
-    # munl['signature']=mSecK.sign(munl['blob'])
     signing_public_key = decodeManifest(validator_gen_keys['manifest'])[
         'signing_public_key']
-
-    print(len(base58ToBytes(signing_public_key)[1:]))    
-    # mprivk='pnjnsiZxWAHAVJnfvANBgdKKvRZqDpGRKsddvkU7q9xSbDUo3Fi'.encode('ascii')
-    # print ('secret key: ','pnjnsiZxWAHAVJnfvANBgdKKvRZqDpGRKsddvkU7q9xSbDUo3Fi'.encode('ascii'), len ('pnjnsiZxWAHAVJnfvANBgdKKvRZqDpGRKsddvkU7q9xSbDUo3Fi'.encode('ascii')))
-    # mSignK = Ed25519PrivateKey.from_private_bytes('pnjnsiZxWAHAVJnfvANBgdKKvRZqDpGRKsddvkU7q9xSbDUo3Fi')
-
-    print ("validation secret key:  ", binascii.unhexlify(validator_gen_keys['validation_secret_key']), len(binascii.unhexlify(validator_gen_keys['validation_secret_key'])))
     
     is_ed25519=(signing_public_key[0]==0xed)
     if is_ed25519:
         print ("IT'S ED25519 key")
         mSignK = Ed25519PrivateKey.from_private_bytes( binascii.unhexlify(validator_gen_keys['validation_secret_key']))
-        # base58ToBytes(binascii.unhexlify(validator_gen_keys['validation_secret_key'])))
         mSignPubK=Ed25519PublicKey.from_public_bytes(base58ToBytes(signing_public_key)[1:])
-        # munl['signature'] = binascii.hexlify(
-        #     mSignK.sign(mblob_bytes.encode('ascii'))).decode('ascii')
+        
         munl['signature'] = mSignK.sign(mblob_bytes.encode('ascii')).hex().upper()
     else:
-        print ("IT'S a ECDSA key")
-        #backend=default_backend()
-        # mSignK = ec.derive_private_key(backend=DSABackend(), curve=ec.SECP256K1(),
-        #             private_value=int.from_bytes(bytes().fromhex(validator_gen_keys['validation_secret_key']),byteorder='big') )
-
-        # mSignPubK = ec.EllipticCurvePublicKeyWithSerialization.from_encoded_point(curve=ec.SECP256K1(),data=base58ToBytes(signing_public_key))
-        # mSignK = cryptography.hazmat.primitives.serialization.load_der_private_key(data=bytes().fromhex(validator_gen_keys['validation_secret_key']),
-        #                                 password=None, backend=default_backend())
-        # mSignPubK = cryptography.hazmat.primitives.serialization.load_der_public_key(data=base58ToBytes(signing_public_key))
-        
-        
+        # print ("IT'S a ECDSA key")
         ### Important info:
         # line:987 https://github.com/ripple/rippled/blob/develop/src/ripple/app/misc/impl/ValidatorList.cpp
-        # The hashing algorithm for the fullhash is sha512half --> SHA512_256()
+        # The hashing algorithm for the fullhash is sha512half --> SHA512_256() <-- WRONG, it's first half of SHA512
         #############
-        # munl['signature'] = mSignK.sign(data= mblob_bytes.encode('ascii'),
-        #     signature_algorithm=ec.ECDSA(hashes.SHA512_256())).hex().capitalize()
-        # munl['signature'] = mSignK.sign(data= mblob_bytes.encode('ascii'),
-        #     signature_algorithm=ec.ECDSA(SHA512half())).hex().capitalize()
-
-        # print("\n\n\n TESTING HASHES :\n {},\n {},\n {} \n\n\n".format(
-        #      mSignK.sign(data= mblob_bytes.encode('ascii'),signature_algorithm=ec.ECDSA(hashes.SHA512())).hex(),
-        #      mSignK.sign(data= mblob_bytes.encode('ascii'),signature_algorithm=ec.ECDSA(hashes.SHA512_256())).hex(),
-        #      mSignK.sign(data= mblob_bytes.encode('ascii'),signature_algorithm=ec.ECDSA(SHA512half())).hex())) #,\n {},\n {},\n {},\n {},\n {},\n {}
-        # #     mSignK.sign(data= mblob_bytes.encode('ascii'),signature_algorithm=ec.ECDSA(hashes.SHA512_224())).hex(),
-        #     mSignK.sign(data= mblob_bytes.encode('ascii'),signature_algorithm=ec.ECDSA(hashes.SHA3_256())).hex(),
-        #     mSignK.sign(data= mblob_bytes.encode('ascii'),signature_algorithm=ec.ECDSA(hashes.SHA3_512())).hex(),
-        #     mSignK.sign(data= mblob_bytes.encode('ascii'),signature_algorithm=ec.ECDSA(hashes.SHAKE256(digest_size=140))).hex(),
-        #     mSignK.sign(data= mblob_bytes.encode('ascii'),signature_algorithm=ec.ECDSA(hashes.SHA256())).hex(),
-        #     mSignK.sign(data= mblob_bytes.encode('ascii'),signature_algorithm=ec.ECDSA(hashes.SHA384())).hex(),
-        #     mSignK.sign(data= mblob_bytes.encode('ascii'),signature_algorithm=ec.ECDSA(hashes.SHA1())).hex()
-        #         ))
         
         # using ECPY 
         mSignK = ECPrivateKey(int(validator_gen_keys['validation_secret_key'],16),_CURVE)
@@ -692,19 +609,10 @@ def createUNL(validators_names_list: list, validator_gen_keys: dict, version: in
         mSignPubK=ECPublicKey(pubkey_point)
         munl['signature'] = _SIGNER.sign_rfc6979(sha512_first_half(mblob_bytes.encode('ascii')),mSignK,sha256,canonical=True).hex().upper()
         
-        # .sign(mblob_bytes.encode('ascii')).hex()
-    # man_signature=mSignK.sign(munl)#createManifestForSigning(sequence,public_key,signing_public_key))
-    
-    # mSignPK = mSignK.public_key().public_bytes(serialization.Encoding.Raw, serialization.PublicFormat.Raw)
-
-    
-#    print ("PublicKey for validation_secret_key :", mSignPK , bytesToBase58(b'\xed'+mSignPK),binascii.hexlify(mSignPK), len(mSignPK))
-    
-#    print ("manifest signing public key: ", signing_public_key, mSignPubK.public_bytes(serialization.Encoding.Raw,serialization.PublicFormat.Raw))
-
-    print( "\nmblob bytes: ",mblob_bytes, type(mblob_bytes.encode('ascii')))
-    print("\nvalidator gen keys:",validator_gen_keys)
-    print("\n manifest: ", decodeManifest(validator_gen_keys['manifest']))
+      
+    # print( "\nmblob bytes: ",mblob_bytes, type(mblob_bytes.encode('ascii')))
+    # print("\nvalidator gen keys:",validator_gen_keys)
+    # print("\n manifest: ", decodeManifest(validator_gen_keys['manifest']))
     
     #print("unl signature: ", munl['signature'], len(munl['signature']))
 
@@ -712,7 +620,7 @@ def createUNL(validators_names_list: list, validator_gen_keys: dict, version: in
     munl['version'] = 1
     munl['public_key'] = base58ToHex(validator_gen_keys['public_key'].decode('ascii')).upper().decode('ascii')
 
-    print("\nDEBUG: createUNL(): ", validator_gen_keys, munl)
+    # print("\nDEBUG: createUNL(): ", validator_gen_keys, munl)
 
     return munl
 
@@ -733,7 +641,7 @@ def verifyUNL(unl):
         # print("Original:     ", v['manifest'])#base64.b64decode(v['manifest']))
         vv=verifyManifest(v['manifest'])
         mres&=vv
-        print (vman['master_public_key'], vv)
+        # print (vman['master_public_key'], vv)
 
     return mres
 

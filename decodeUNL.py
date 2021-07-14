@@ -37,6 +37,9 @@ if aa.file :
     lfile=aa.file
     with open(lfile,'r') as f:
         vlistcont=json.load(f)
+        if len(vlistcont.keys())==0:
+            print("Empty input!")
+            sys.exit(0)
 else:
     # should be retrieved from url
     if len(aa.url)>0:
@@ -65,7 +68,8 @@ if aa.print_blob:
     print(json.dumps(list_blob))
 
 if aa.print_validators:
-    print (list_blob['validators'])
+    # print (list_blob['validators'])
+    print (json.dumps(list_blob['validators']))
 
 
 lman=utils.decodeManifest(vlistcont['manifest'])
@@ -87,22 +91,23 @@ if aa.output_file:
         json.dump(list_blob,f)
 
 if aa.verify:
-    import binascii
-    mres=False
-    if utils.verifyManifest(vlistcont['manifest']) :
-        print (" UNL manifest verified successfully!")
-        mres=True
+    # import binascii
+    # mres=False
+    # if utils.verifyManifest(vlistcont['manifest']) :
+    #     # print (" UNL manifest verified successfully!")
+    #     mres=True
 
-    if utils.verify(utils.base58ToBytes(lman['signing_public_key']), base64.b64decode(vlistcont['blob']), binascii.a2b_hex(vlistcont['signature'])) :
-        print (" UNL blob verified successfully!")
-        #^^^ worked
-        mres&=True
+    # if utils.verify(utils.base58ToBytes(lman['signing_public_key']), base64.b64decode(vlistcont['blob']), binascii.a2b_hex(vlistcont['signature'])) :
+    #     # print (" UNL blob verified successfully!")
+    #     #^^^ worked
+    #     mres&=True
     
-    if mres:
-        print ("UNL verified successfully!")
-    else:
-        print ("UNL could not get verified!!!")
+    # if mres:
+    #     # print ("UNL verified successfully!")
+    #     pass
+    # else:
+    #     print ("UNL could not get verified!!!")
     
-    print ("verification:",utils.verifyUNL(vlistcont))
+    print ("Verified: ",utils.verifyUNL(vlistcont))
 
 
