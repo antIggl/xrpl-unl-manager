@@ -56,7 +56,7 @@ if __name__=='__main__':
 
     DEFAULT_TIMEDIFF=31528800.0 # One year
 
-    argparser=argparse.ArgumentParser(description="Encodes a Ripple UNL from a file containing either a JSON list or line-separated validator names")
+    argparser=argparse.ArgumentParser(description="Encodes a XRP Ledger UNL from a file containing either a JSON list or line-separated validator names")
     argparser.add_argument("-f","--list-file", default='./unl-list.json', type=str, help="Defines the UNL file to be parsed. It needs the validators-keys-path")
     argparser.add_argument("-blf","--bloblist-file", type=str, help="Defines the UNL blob list file to be parsed. \n - Expiration date and sequence can be set separately")
     argparser.add_argument("-bf","--blob-file", type=str, help="Defines the UNL blob file to be parsed \n - Expiration date and sequence cannot be set")
