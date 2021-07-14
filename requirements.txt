@@ -1,4 +1,4 @@
-base58==2.0.1
+base58==2.1.0
 cffi==1.14.0
 daemon==1.2
 cryptography==3.3.2

@@ -48,11 +48,11 @@ def hexToBase58(key):
     payload_str = '1C'+key
     payload_unhex = binascii.unhexlify(payload_str)
     checksum = doubleSha256(payload_str)[0:4]
-    return base58.b58encode(payload_unhex+checksum, base58.RIPPLE_ALPHABET)
+    return base58.b58encode(payload_unhex+checksum, base58.XRP_ALPHABET)
 
 
 def base58ToHex(b58_str):
-    decb58 = base58.b58decode(b58_str, base58.RIPPLE_ALPHABET)
+    decb58 = base58.b58decode(b58_str, base58.XRP_ALPHABET)
     payload_unhex = decb58[:-4]
     checksum = decb58[-4:]
     payload_hex = binascii.hexlify(payload_unhex)
@@ -65,7 +65,7 @@ def base58ToHex(b58_str):
 
 
 def base58ToBytes(b58_str):
-    decb58 = base58.b58decode(b58_str, base58.RIPPLE_ALPHABET)
+    decb58 = base58.b58decode(b58_str, base58.XRP_ALPHABET)
     payload_unhex = decb58[:-4]
     checksum = decb58[-4:]
     payload_hex = binascii.hexlify(payload_unhex)
