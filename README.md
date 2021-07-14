@@ -130,7 +130,7 @@ usage: encodeUNL.py [-h] [-f LIST_FILE] [-blf BLOBLIST_FILE] [-bf BLOB_FILE]
                     [-v VERSION] [-xd EXPIRE_DATE] [-kf KEYS_FILE]
                     [-kp VALIDATORS_KEYS_PATH] [-o OUTPUT_FILE]
 
-Encodes a Ripple UNL from a file containing either a JSON list or line-
+Encodes a XRP Ledger UNL from a file containing either a JSON list or line-
 separated validator names
 
 optional arguments:
