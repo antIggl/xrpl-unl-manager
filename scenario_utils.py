@@ -71,6 +71,13 @@ class UNLScenario():
         Arguments:
             timestamp {[type]} -- [description]
         """
+        if len(self.ordered_states)==0:
+            print (" NO STATES in the scenario file!!!")
+            return None
+
+        if len(self.ordered_states)==1:
+            return self.states[self.ordered_states[0]]
+
         for curstate, nextstate in [(self.ordered_states[i-1], self.ordered_states[i]) for i in range(1, len(self.ordered_states))]:
             if not (curstate.isnumeric() and nextstate.isnumeric()):
                 continue
@@ -157,7 +164,7 @@ class ScenarioVisualizer():
         medges=""
         for v,o in validators_state.items():
             for pn in o['unl']:
-                medges+="%s --> %s \n".format(v,pn)
+                medges+="{0} --> {1}\n".format(v,pn)
 
         graphText=graphTemplate.replace("<edges>",medges)
         html = markdown.markdown(graphText, extensions=['md_mermaid'])

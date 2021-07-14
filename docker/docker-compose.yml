@@ -1,0 +1,66 @@
+version : "3.5"
+
+networks:
+  testnet:
+    external: true
+    name: ${TESTNET_NAME:-ripple_testnet}
+
+volumes:
+  xrpl-unls-root:
+    external: true
+    name: xrpl-unls-root
+#  unl-publisher-config:
+
+services:
+  unl_publisher:
+    container_name: ${UNL_PUBLISHER_CONTAINER_NAME:-xrpl-unl-publisher}
+    image: nginx
+    volumes:
+      - xrpl-unls-root:/usr/share/nginx/html:ro
+      - ${UNL_PUBLISHER_CONFIG:-./docker/nginx/conf.d}:/etc/nginx/conf.d:ro
+    networks:
+      - testnet
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+        max_attempts: 3
+        window: 180s
+    ports:
+     - 8880:80
+    expose:
+      - 80
+      
+  unl-manager:
+    container_name: xrpl-unl-manager
+    image: python:3
+    volumes:
+      - xrpl-unls-root:/working_dir/publish/
+      - ${UNL_MANAGER_APP_ROOT:-./}:/app/
+      - ${UNL_MANAGER_CONFIGFILE:-./unl-manager-docker.conf}:/working_dir/unl-manager.conf
+      - ${UNL_SCENARIO_FILE:-./unl-scenario.json}:/working_dir/unl-scenario.json
+      # - ${UNL_MANAGER_KEYFILE:-./validator-token.txt}:/working_dir/validators-config/unl-manager/validator-token.txt
+      - ${UNL_MANAGER_KEYFILE:-./validator-token.txt}:/working_dir/unlmanager-token.txt
+      - ${VALIDATORS_KEYS_PATH:-./validators-config/}:/working_dir/validators-config/
+
+    working_dir: /app
+#    tty: true
+    entrypoint: /app/docker/init_container.sh
+    command: ./unl_manager.py --start
+    # command: ./unl_manager.py --start -d
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+        max_attempts: 3
+        window: 180s
+    environment:
+      UNL_MANAGER_CONFIGFILE: /working_dir/unl-manager.conf
+#      UNL_MANAGER_TOKEN: /working_dir/unlmanager-token.txt
+      # UNL_PUBLISH_PATH: /working_dir/publish/unls
+#      UNL_SCENARIO_FILE: /working_dir/unlscenario.json
+      # VALIDATORS_KEYS_PATH:/working_dir/configfiles/
+      UNL_VISUALIZATION_PATH: /working_dir/publish/graph/
+#      UNL_VISUALIZATION_FORMAT: "mermaid"
+      UNL_VISUALIZATION_FORMAT: "dot"
+#      UNL_VISUALIZATION_FORMAT: "JSON"
+      
+

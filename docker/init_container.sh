@@ -6,4 +6,4 @@ pip install -r /app/requirements.txt
 
 echo "    Done!"
 
-/bin/bash
+$1

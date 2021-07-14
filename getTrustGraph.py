@@ -2,7 +2,7 @@
 import argparse
 import sys
 import utils
-import scenario_utils
+import scenario_utils as scutils
 import json
 
 argparser=argparse.ArgumentParser(description="Extracts the Trust Graph from a scenario file at the given time")
