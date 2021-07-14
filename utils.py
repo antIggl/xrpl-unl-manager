@@ -507,7 +507,7 @@ def createUNL_from_bloblist(bloblist: list, validator_gen_keys: dict, version: i
     """
     munl = {}
     mblob_data = {}
-    mblob_data['validators'] = bloblist
+    
     mblob_data['sequence'] = version
     if expiration_date==None:
         # We set the expiration date to be 1 year after.
@@ -516,6 +516,7 @@ def createUNL_from_bloblist(bloblist: list, validator_gen_keys: dict, version: i
     else:
         mblob_data['expiration'] = int(convertToRippleTime(expiration_date))
 
+    mblob_data['validators'] = bloblist
     # print(mblob_data, type(mblob_data))
     mblob_bytes=json.dumps(mblob_data)
     
@@ -571,8 +572,7 @@ def createUNL(validators_names_list: list, validator_gen_keys: dict, version: in
     """
     munl = {}
     mblob_data = {}
-    mblob_data['validators'] = createValidatorsList(
-        validators_names_list, keys_path)
+    
     mblob_data['sequence'] = version
     if expiration_date==None:
         # We set the expiration date to be 1 year after.
@@ -580,6 +580,9 @@ def createUNL(validators_names_list: list, validator_gen_keys: dict, version: in
         mblob_data['expiration'] = int(convertToRippleTime(time.time()) + td)
     else:
         mblob_data['expiration'] = int(convertToRippleTime(expiration_date))
+
+    mblob_data['validators'] = createValidatorsList(
+        validators_names_list, keys_path)
 
     mblob_bytes=json.dumps(mblob_data)
     
