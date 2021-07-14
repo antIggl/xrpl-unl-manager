@@ -71,7 +71,8 @@ if aa.print_validators:
 lman=utils.decodeManifest(vlistcont['manifest'])
 if aa.print_manifest :
     # print("Printing decoded manifest of the list")
-    print (json.dumps(lman))
+    print (lman)
+    #print (json.dumps(lman))
 
 if aa.print_signature:
     print(vlistcont['signature'])
@@ -101,9 +102,7 @@ if aa.verify:
         print ("UNL verified successfully!")
     else:
         print ("UNL could not get verified!!!")
-         
-
-    #print ("verification:",utils.verifyUNL(vlistcont))
-
-
     
+    print ("verification:",utils.verifyUNL(vlistcont))
+
+
