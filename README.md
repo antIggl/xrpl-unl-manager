@@ -1,8 +1,11 @@
 # XRPL UNL Manager
 Set of scripts to encode/decode and manage Unique Node Lists for XRPL testnet validators.
 
-***IT'S STILL UNDER HEAVY DEVELOPMENT***
-
+**Update 14/07/2021 :** 
+* Not released yet, but most of the parts are working.
+* Extensive testing is required.
+* Documentation and release as python package are in my plans too.
+ 
 ## How it works
 These scripts are used to execute a scenario of UNL changes in a XRPL Testnet.
 * *unl_manager.py* : can run as a system daemon or standalone. It runs in a loop an executes the UNL changes for each validator as it is defined in the scenario file.
@@ -219,5 +222,5 @@ Verified:  True
 ```
 
 ## Contributors
-* Antonios Inglezakis (@antiggl)
+* Antonios Inglezakis (@antiggl), Leading Researcher and Developer, University of Nicosia
 * Alloy Networks (@alloyxrp)
