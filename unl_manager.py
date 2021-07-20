@@ -121,6 +121,10 @@ def generateUNLsAtTime(mscenario,unlPubToken,pub_path,keys_path,timestamp):
         updateSymlink(os.path.dirname(fpath)+'/'+DEFAULT_PUBLISHED_UNL_FILENAME,fpath)            
         #updateSymlink(os.path.dirname(fpath)+'/'+DEFAULT_PUBLISHED_UNL_FILENAME,'./'+os.path.basename(fpath))            
         print ("\t \t Done!")
+        # mscV=scutils.ScenarioVisualizer(msc)
+
+        # mdotg=mscV.getUNLGraphAtTime(0)
+        # mdotg.render('./testout.gv',view=True)
     
 
 if __name__=='__main__':

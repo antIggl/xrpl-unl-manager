@@ -459,6 +459,10 @@ def createUNL_from_blob(blob_dict,validator_gen_keys:dict):
     Creates a properly signed UNL with the blob_dict.
     """
     munl = {}
+
+    munl['public_key'] = base58ToHex(validator_gen_keys['public_key'].decode('ascii')).upper().decode('ascii')
+    munl['manifest'] = validator_gen_keys['manifest']
+
     mblob_bytes = json.dumps(blob_dict)
     mblob_bin = base64.b64encode(mblob_bytes.encode('ascii'))
     munl['blob']=mblob_bin.decode('ascii')
@@ -491,9 +495,9 @@ def createUNL_from_blob(blob_dict,validator_gen_keys:dict):
     
     #print("unl signature: ", munl['signature'], len(munl['signature']))
 
-    munl['manifest'] = validator_gen_keys['manifest']
+    # munl['manifest'] = validator_gen_keys['manifest']
     munl['version'] = 1
-    munl['public_key'] = base58ToHex(validator_gen_keys['public_key'].decode('ascii')).upper().decode('ascii')
+    # munl['public_key'] = base58ToHex(validator_gen_keys['public_key'].decode('ascii')).upper().decode('ascii')
 
     # print("\nDEBUG: createUNL(): ", validator_gen_keys, munl)
 
@@ -507,7 +511,10 @@ def createUNL_from_bloblist(bloblist: list, validator_gen_keys: dict, version: i
     """
     munl = {}
     mblob_data = {}
-    
+
+    munl['public_key'] = base58ToHex(validator_gen_keys['public_key'].decode('ascii')).upper().decode('ascii')
+    munl['manifest'] = validator_gen_keys['manifest']
+
     mblob_data['sequence'] = version
     if expiration_date==None:
         # We set the expiration date to be 1 year after.
@@ -549,9 +556,9 @@ def createUNL_from_bloblist(bloblist: list, validator_gen_keys: dict, version: i
     
     #print("unl signature: ", munl['signature'], len(munl['signature']))
 
-    munl['manifest'] = validator_gen_keys['manifest']
+    
     munl['version'] = 1
-    munl['public_key'] = base58ToHex(validator_gen_keys['public_key'].decode('ascii')).upper().decode('ascii')
+   
 
     # print("\nDEBUG: createUNL(): ", validator_gen_keys, munl)
 
@@ -572,6 +579,13 @@ def createUNL(validators_names_list: list, validator_gen_keys: dict, version: in
     """
     munl = {}
     mblob_data = {}
+    
+    # keys sequence on vl.ripple.com
+    # public_key, manifest, blob, signature, version
+
+    
+    munl['public_key'] = base58ToHex(validator_gen_keys['public_key'].decode('ascii')).upper().decode('ascii')
+    munl['manifest'] = validator_gen_keys['manifest']
     
     mblob_data['sequence'] = version
     if expiration_date==None:
@@ -619,10 +633,8 @@ def createUNL(validators_names_list: list, validator_gen_keys: dict, version: in
     
     #print("unl signature: ", munl['signature'], len(munl['signature']))
 
-    munl['manifest'] = validator_gen_keys['manifest']
     munl['version'] = 1
-    munl['public_key'] = base58ToHex(validator_gen_keys['public_key'].decode('ascii')).upper().decode('ascii')
-
+    
     # print("\nDEBUG: createUNL(): ", validator_gen_keys, munl)
 
     return munl

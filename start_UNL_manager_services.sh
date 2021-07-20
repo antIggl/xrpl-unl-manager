@@ -10,7 +10,7 @@ UNL_SCENARIO_FILE=${UNL_SCENARIO_FILE:-"${BASE_DIR}/sample-unl-scenario.json"}
 UNL_MANAGER_KEYFILE=${UNL_MANAGER_KEYFILE:-"${BASE_DIR}/unl-manager-token.txt"}
 
 #enable debug
-set -x
+#set -x
 
 if [[ -n $TESTNET_NAME ]]; then
   running_testnet=$TESTNET_NAME
@@ -47,7 +47,7 @@ VALIDATORS_KEYS_PATH=${VALIDATORS_KEYS_PATH} \
 
 
 echo "Waiting for everything goes up..."
-sleep 3
+sleep 8
 
 if [[ -n $(docker container ls -q --filter=name=${UNL_PUBLISHER_CONTAINER_NAME}) ]]; then
   echo "   ${UNL_PUBLISHER_CONTAINER_NAME} is running.  OK"
@@ -57,4 +57,4 @@ else
 fi;
 
 
-set +x
+#set +x
