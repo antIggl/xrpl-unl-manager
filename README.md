@@ -224,3 +224,8 @@ Verified:  True
 ## Contributors
 * Antonios Inglezakis (@antiggl), Leading Researcher and Developer, University of Nicosia
 * Alloy Networks (@alloyxrp)
+
+## Acknowledgements
+This work is funded by the Ripple’s Impact Fund, an advised fund of Silicon Valley Community Foundation (Grant id: 2018–188546).
+Link: [https://ubri.ripple.com/]
+
