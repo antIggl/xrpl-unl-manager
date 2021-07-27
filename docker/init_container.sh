@@ -6,4 +6,4 @@ pip install -r /app/requirements.txt
 
 echo "    Done!"
 
-$1
+exec "$@"

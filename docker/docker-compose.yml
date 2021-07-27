@@ -44,7 +44,7 @@ services:
 
     working_dir: /app
 #    tty: true
-    entrypoint: /app/docker/init_container.sh
+    entrypoint: ["/app/docker/init_container.sh"]
     command: ./unl_manager.py -conf /working_dir/unl-manager.conf --start 
     # command: ./unl_manager.py --start -d
     deploy:
