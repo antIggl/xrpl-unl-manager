@@ -9,3 +9,4 @@ pycparser==2.20
 six==1.15.0
 requests==2.25.1
 ECPy==1.2.5
+pydantic==1.8.2

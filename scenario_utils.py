@@ -5,6 +5,15 @@ import concurrent
 import utils
 from graphviz import Digraph
 import markdown
+#from  pydantic import BaseModel
+from typing import Optional
+
+#class ScenarioAuthor(BaseModel):
+#    fullname: str
+#    email: Optional[str]
+#    affiliation: Optional[str]
+
+
 
 class UNLScenario():
     def __init__(self, scenario_fname=None, scenario_json=None):
@@ -14,6 +23,10 @@ class UNLScenario():
             scenario_fname {[type]} -- [description] (default: {None})
             scenario_json {[type]} -- [description] (default: {None})
         """
+        self.name="Unnamed"
+        self.authors=[]
+        self.description=""
+        #self.states={}
         fcont = None
         if scenario_fname and scenario_json:
             print("Only one of json or file can be used. Defaults to JSON")
@@ -24,7 +37,10 @@ class UNLScenario():
         elif scenario_json:
             fcont = scenario_json
             self._load_scenario(fcont)
-
+    def generate_init_state(self,nvalidators=20,nstates=3):
+        """
+        Initializes the 
+        """
     def from_file(self, scenario_fname):
         with open(scenario_fname, 'r') as f:
             fcont = json.load(f)
@@ -34,7 +50,7 @@ class UNLScenario():
         for k, v in scenario_json.items():
             self.__setattr__(k, v)
 
-        if not self.__getattribute__('states'):
+        if not self.__getattribute__('states') or self.states==None or self.states=={} :
             print("scenario file is not properly structured. No states attribute found.")
             return
 
