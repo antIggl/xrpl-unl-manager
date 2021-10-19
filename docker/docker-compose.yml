@@ -15,16 +15,12 @@ services:
   unl_publisher:
     container_name: ${UNL_PUBLISHER_CONTAINER_NAME:-xrpl-unl-publisher}
     image: nginx
+    restart: unless-stopped
     volumes:
       - xrpl-unls-root:/usr/share/nginx/html:ro
       - ${UNL_PUBLISHER_CONFIG:-./docker/nginx/conf.d}:/etc/nginx/conf.d:ro
     networks:
       - testnet
-    deploy:
-      restart_policy:
-        condition: unless-stopped
-        max_attempts: 3
-        window: 180s
     ports:
      - 8880:80
     expose:
@@ -33,6 +29,7 @@ services:
   unl-manager:
     container_name: xrpl-unl-manager
     image: python:3
+    restart: unless-stopped
     volumes:
       - xrpl-unls-root:/working_dir/publish/
       - ${UNL_MANAGER_APP_ROOT:-./}:/app/
@@ -47,11 +44,6 @@ services:
     entrypoint: ["/app/docker/init_container.sh"]
     command: ./unl_manager.py -conf /working_dir/unl-manager.conf --start 
     # command: ./unl_manager.py --start -d
-    deploy:
-      restart_policy:
-        condition: unless-stopped
-        max_attempts: 3
-        window: 180s
     environment:
       UNL_MANAGER_CONFIGFILE: /working_dir/unl-manager.conf
 #      UNL_MANAGER_TOKEN: /working_dir/unlmanager-token.txt
