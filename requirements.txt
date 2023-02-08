@@ -1,7 +1,7 @@
 base58==2.1.0
 cffi==1.14.0
 daemon==1.2
-cryptography==3.3.2
+cryptography==39.0.1
 graphviz==0.14
 lockfile==0.12.2
 Markdown==3.2.2
